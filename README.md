@@ -1,4 +1,4 @@
-This is my homebrew golang based blog, which powers www.junglecoder.com
+This is my homebrew golang based blog engine, currently which powers www.junglecoder.com
 
 
 ##Unstable 

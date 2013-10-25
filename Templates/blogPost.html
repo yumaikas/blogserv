@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<link href="/css/homepage.css" rel="stylesheet" type="text/css">
+		<title>
+			{{.Title}} | Jungle Coder
+		</title>
+	</head>
+	<body>
+		<div class="headingBacker">
+			<a class="heading" href="/">Jungle Coder</a>
+			<p id="motto"><i>The musings of a third culture coder and missionary kid</i></p>
+		</div>
+		<div id="main">
+			<div class="sidebar">
+				<div class="content">
+				<div class="sidebar-link"><a href="/">Home</a></div>
+				<div class="sidebar-link"><a href="/blog/AboutMe">About Me</a></div>
+				<div class="sidebar-link"><a href="/blog/feed.xml">RSS feed</a></div>
+				<p>
+					Welcome to my blog. This website/blog is still under construction, so there are a few rough edges.
+				</p>
+				<p>UPDATE: RSS feed added, one edge smoothed</p>
+				<p>
+					To come as my <a href="http://www.catb.org/jargon/html/C/copious-free-time.html">copious free time</a> allows:
+				</p>
+				<ul>
+					<li>Archive list of blog posts and date based permalinks
+					</li>
+					<li><del>RSS feed.</del>
+					</li>
+				</ul>
+				</div>
+			</div>
+			<div class="content left body">
+				<h2>
+					{{.Title}}
+				</h2>
+				<a>Next</a>
+				<a>Previous</a>
+				{{/*The content will need to be valid html, but aware that it will be in an article*/}} 
+				{{.Content}}
+			</div>
+			<div class="content left">
+				<h3>
+					Comments
+				</h3>{{range .Comments}}
+				<h4>
+					{{.UserName}}
+				</h4>
+				<p>
+					{{.Content}}
+				</p>{{else}} There are no comments for this article yet. {{end}}
+			</div>
+			<div class="content left">
+				<form action="/submitComment/{{.URL}}" method="post" id="bottomComment">
+					<fieldset>
+						<textarea name="Comment" id="comment" cols="30" rows="10" placeholder="What did you want to say?...">
+	</textarea><br>
+						Email:*<input type="text" name="email"><br>
+						Name:*<input type="text" name="author"><br>
+						Reqired fields are marked with a '*'<br>
+						<input type="submit" value="Submit">
+					</fieldset>
+				</form>
+			</div>
+	</div>
+	</body>
+</html>

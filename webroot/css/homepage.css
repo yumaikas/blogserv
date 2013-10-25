@@ -1,0 +1,108 @@
+a {
+	color: #11Ad11; 
+}
+.title {
+	text-decoration: none; 
+	font-family: "Lucida Bright", Georgia, serif;
+}
+
+a.title {
+	color: #555555;
+}
+a:hover.title{
+	color: #000000;
+}
+
+/*This is the container element that houses everything outside of the title bar*/
+#main {
+	max-width: 850px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.background {
+  background-color: #013000;
+}
+
+.content {
+	background-color: #FFFFFF;
+	padding: 20px;
+	color: #000000;
+	font-family:  Helvetica, calibri, sans-serif;
+}
+.headingBacker{
+	background-color: #004d00;
+	color: #FFFFFF;
+	text-align: center;
+	padding-top: 20px;
+}
+#motto{
+	margin-top: 2px;
+	padding-bottom: 10px;
+	font-size: 10pt;
+	margin-bottom: 0px;
+}
+.heading {
+	font-family: "Lucida Bright", Georgia, serif;
+	/*font-family: Georgia, serif;*/
+	font-size: 24pt;
+	text-align: center;
+	color: #FFFFFF;
+	font-style: bold;
+	text-decoration: none;
+}
+.sidebar-link{
+	padding: 1px;
+}
+.left {
+	margin-right: 10px;
+	/* margin-left: 10px; */ 
+	max-width: 600px; 
+}
+.body {
+	font-size: 11pt;	
+}
+.comment{
+}
+.sidebar {
+	float: right;
+	width: 250px;
+	margin-left: 10px;
+	margin-bottom: 10px;
+	border: dashed;
+	border-top: none;
+	border-color: #11Ad11;
+	border-width: 1px;
+	font-size: 11pt
+}
+.top-space {
+	/* margin-top: 15px; */ 
+}
+code {
+	font-family: Consolas, monospace;
+	font-size: 11pt;
+	background-color: #DDDDDD;
+}
+pre {
+	background-color: #DDDDDD;
+	overflow: auto; 
+}
+body {
+	margin: 0px; 
+}
+h2 {
+	font-family: "Lucida Bright", Georgia, serif;
+}
+h3 {
+	font-family: "Lucida Bright", Georgia, serif;
+}
+h4 {
+	font-family: "Lucida Bright", Georgia, serif;
+	font-size: 20;
+}
+h5 {
+	font-family: "Lucida Bright", Georgia, serif;
+}
+h6 {
+	font-family: "Lucida Bright", Georgia, serif;
+}

@@ -1,0 +1,60 @@
+% {{.Title}} | Jungle Coder
+% 
+% 
+
+<div class="heading">
+[Jungle Coder](/)
+
+</div>
+<div id="main">
+<div class="sidebar">
+<div class="content">
+[Home](/blog/)\
+ [About Me](/blog/AboutMe)
+
+Welcome to my blog. This website/blog is still under construction, so
+there are a few rough edges.
+
+To come as my [copious free
+time](http://www.catb.org/jargon/html/C/copious-free-time.html) allows:
+
+-   Archive list of blog posts
+-   RSS feed.
+
+</div>
+</div>
+<div class="content left body">
+{{.Title}}
+----------
+
+{{/\*The content will need to be valid html, but aware that it will be
+in an article\*/}} {{.Content}}
+
+</div>
+<div class="content left">
+### Comments
+
+{{range .Comments}}
+
+#### {{.UserName}}
+
+{{.Content}}
+
+{{else}} There are no comments for this article yet. {{end}}
+
+</div>
+<div class="content left">
+<form action="/submitComment/{{.URL}}" method="post" id="bottomComment">
+<fieldset>
+<textarea name="Comment" id="comment" cols="30" rows="10" placeholder="What did you want to say?...">
+</textarea>
+\
+ Email:\*<input type="text" name="email">\
+ Name:\*<input type="text" name="author">\
+ Reqired fields are marked with a ‘\*’\
+ <input type="submit" value="Submit">
+
+</fieldset>
+</form>
+</div>
+</div>

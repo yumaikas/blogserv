@@ -1,148 +1,86 @@
 package main //blogservModels
 
 import (
-	secret "blogserv_secret"
-	"database/sql"
 	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tgascoigne/akismet"
 	"log"
 	"net/http"
+	arts "yumaikas/blogserv/blogArticles"
+	"yumaikas/blogserv/config"
 )
-
-type Comment struct {
-	UserName, Content string
-}
 
 var (
 	Err404 error           = errors.New("404: The article you are looking for doesn't exist.")
 	Err500 error           = errors.New("500: Something went wrong in the server. :(")
-	config *akismet.Config = &akismet.Config{
-		APIKey:    secret.AkismetKey,
+	akis   *akismet.Config = &akismet.Config{
+		APIKey:    config.AkismetKey(),
 		Host:      "http://www.yumaikas.com",
-		UserAgent: akismet.UserAgentString("blogserv/0.5.0"),
+		UserAgent: akismet.UserAgentString("blogserv/0.5.1"),
 	}
 	//db *sql.DB
 )
 
-//Hand ownership of the database handle to the calling method
-func dbOpen() (*sql.DB, func(), error) {
-	db, err := sql.Open("sqlite3", secret.DBPath)
-	drop := func() {
-		db.Close()
-	}
-	return db, drop, err
+type Article arts.Article
+type Comment arts.Comment
+
+//Handy for debugging things
+func dump(me string) string {
+	fmt.Println(me)
+	return me
 }
+
 func akismet_init() {
-	err := akismet.VerifyKey(config)
+	err := akismet.VerifyKey(akis)
 	if err != nil {
 		log.Fatal("Invalid akismet api key")
 	}
 }
 
-func listArticles() ([]Article, error) {
-	var ars = make([]Article, 0)
-	db, drop, err := dbOpen()
-	defer drop()
-	if err != nil {
-		return nil, Err500
-	}
-
-	//The article query
-	rows, err := db.Query(`
-	Select Title, URL, Content 
-	from Articles Order by id Desc`)
-	if err != nil {
-		return nil, Err500
-	}
-	for rows.Next() {
-		var ar Article
-		rows.Scan(&ar.Title, &ar.URL, &ar.content)
-		ars = append(ars, ar)
-	}
-	if err != nil {
-		//Log to output, but simply throw a 500 error to the user
-		fmt.Printf("An error occured while trying to fetch articles: %s", err.Error())
-		return ars, Err500
-	}
-	return ars, nil
-}
-
 func RSSArticles() (rssfeed, error) {
-	ars, err := listArticles()
+	ars, err := arts.ListArticles()
 	return rssfeed(ars), err
 }
+func listArticles(filter func(arts.Article) bool) (articleList, error) {
+	ars, err := arts.ListArticles()
+	artemp := make([]arts.Article, 0)
+	for _, val := range ars {
+		if filter(val) {
+			artemp = append(artemp, val)
+		}
+	}
+	return articleList(artemp), err
+}
+func DraftsArticles() (articleList, error) {
+	return listArticles(arts.IsDraft)
+}
+
 func HTMLArticles() (articleList, error) {
-	ars, err := listArticles()
-	return articleList(ars), err
+	return listArticles(arts.IsPublished)
 }
 
 //Populates an article based on a title.
 func fillArticle(URL string) (Article, error) {
-	var ar Article
-	db, drop, err := dbOpen()
-	defer drop()
-	if err != nil {
-		return ar, Err500
+	ar, err := arts.FillArticle(URL)
+	if err == arts.ErrArticleNotFound {
+		fmt.Println(err)
+		return Article(ar), err
+	} else if err != nil {
+		fmt.Println(err)
+		return Article(ar), Err500
 	}
-
-	var articleId int
-	err = db.QueryRow(`
-		Select Title, URL, Content, id 
-		from Articles 
-		where URL = ?`,
-		URL).Scan(&ar.Title, &ar.URL, &ar.content, &articleId)
-	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			return ar, Err404
-		default:
-			//debug, for production use fmt.PrintF(err)
-			log.Fatal(err)
-			return ar, err
-		}
-	}
-	//Get the comments for the article
-	commentQ, err := db.Prepare(`
-	Select U.screenName, C.Content from 
-	Comments as C
-	inner join Users as U on C.UserID = U.id
-	where C.ArticleID = ?`)
-	if err != nil {
-		//debug, for production use fmt.PrintF(err)
-		log.Fatal(err)
-		return ar, err
-	}
-
-	rows, err := commentQ.Query(articleId)
-	if err != nil {
-		//debug, for production use fmt.PrintF(err)
-		log.Fatal(err)
-		return ar, err
-	}
-
-	ar.Comments = make([]Comment, 0)
-
-	for rows.Next() {
-		var c Comment
-		err = rows.Scan(&c.UserName, &c.Content)
-		if err != nil {
-			//debug, for production use fmt.Printf(err)
-			log.Fatal(err)
-			return ar, err
-		}
-
-		if len(c.Content) > 0 {
-			ar.Comments = append(ar.Comments, c)
-		}
-	}
-	if len(ar.Comments) == 0 {
-		ar.Comments = nil
-	}
-	return ar, nil
+	return Article(ar), nil
 }
 
+func (ars articleList) IsAdmin() bool {
+	for _, ar := range ars {
+		if !ar.IsAdmin {
+			return false
+		}
+	}
+	return true
+}
 func postComment(w http.ResponseWriter, r *http.Request) {
 	articleName := r.URL.Path[len("/submitComment/"):]
 
@@ -154,11 +92,11 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 		AuthorEmail: r.FormValue("email"),
 		Content:     r.FormValue("Comment"),
 	}
-	err := akismet.CommentCheck(config, comment)
+	err := akismet.CommentCheck(akis, comment)
 	if err != nil {
 		switch err {
 		case akismet.ErrSpam:
-			SpamToDB(comment, articleName)
+			arts.SpamToDB(comment, articleName)
 			return
 		case akismet.ErrInvalidRequest:
 			log.Printf("Aksimet request invalid: %s\n", err.Error())
@@ -169,7 +107,9 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 		}
 		return //Nothing more we can do here for now
 	}
-	err = CommentToDB(comment, articleName)
+
+	//Notify here. send the request in.
+	err = arts.CommentToDB(comment, articleName)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -191,93 +131,4 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 type queryComment struct {
 	Sql  string
 	Args func() (int, int, string)
-}
-
-//Currently do nothing
-func SpamToDB(c akismet.Comment, arName string) error {
-	return nil
-}
-
-func CommentToDB(c akismet.Comment, arName string) error {
-	fmt.Print("Enter CommentToDB")
-	defer fmt.Print("Exit CommentToDB")
-	db, drop, err := dbOpen()
-	defer drop()
-	if err != nil {
-		return Err500
-	}
-
-	tx, err := db.Begin()
-	rb := func(e error) error {
-		tx.Rollback()
-		return e
-	}
-	if err != nil {
-		return rb(err)
-	}
-
-	//This is what is going in to the db
-	in := struct {
-		UserID, ArticleID int
-		Content           string
-	}{0, 0, c.Content}
-
-	err = tx.QueryRow(`Select id from Users where Email = ?`, c.AuthorEmail).Scan(&in.UserID)
-	switch {
-	case err == sql.ErrNoRows:
-		var u_err error
-		in.UserID, u_err = addUser(c, tx)
-		if u_err != nil {
-			return rb(err)
-		}
-		break
-	case err != nil:
-		return rb(err)
-	}
-	err = tx.QueryRow(`Select id from Articles where URL = ?`, arName).Scan(&in.ArticleID)
-	if err != nil {
-		return rb(err)
-	}
-	//The results and error(if any)
-	r, err := tx.Exec(`
-	Insert into Comments (UserID, ArticleID, Content) 
-	values (?, ?, ?)`,
-		in.UserID, in.ArticleID, in.Content)
-	if err != nil {
-		return rb(err)
-	}
-	numRows, err := r.RowsAffected()
-	switch {
-	case err != nil:
-		return rb(err)
-	case numRows != 1:
-		return rb(fmt.Errorf("Error: %d rows were affected instead of 1", numRows))
-	}
-	err = tx.Commit()
-	if err != nil {
-		return rb(err)
-	}
-	return nil
-}
-
-func addUser(c akismet.Comment, tx *sql.Tx) (int, error) {
-	//fmt.Print("Enter addUser")
-	//defer fmt.Print("Exit addUser")
-	r, err := tx.Exec("Insert into Users (screenName, Email) values (?, ?)",
-		c.Author, c.AuthorEmail)
-	if err != nil {
-		return 0, err
-	}
-	cnt, err := r.RowsAffected()
-	switch {
-	case err != nil:
-		return 0, err
-	case cnt != 1:
-		return 0, fmt.Errorf("%d rows affected instead of 1", cnt)
-	}
-	//Return the new userID
-	if id, err := r.LastInsertId(); err == nil {
-		return int(id), nil
-	}
-	return 0, err
 }

@@ -1,0 +1,27 @@
+
+			<div class="content">
+				<div class="sidebar-link"><a href="/">Home</a></div>
+				<div class="sidebar-link"><a href="/blog/AboutMe">About Me</a></div>
+				<div class="sidebar-link"><a href="/blog/feed.xml">RSS feed</a></div>
+				<p>
+					Welcome to my blog. This website/blog is still under construction, so there are a few rough edges.
+				</p>
+				<p>UPDATE: Now with https, so that security is increased.</p>
+				<p>UPDATE: RSS feed added, one edge smoothed</p>
+				<p>
+					To come as my <a href="http://www.catb.org/jargon/html/C/copious-free-time.html">copious free time</a> allows:
+				</p>
+				<ul>
+					<li>Archive list of blog posts and date based permalinks
+					</li>
+					<li><del>RSS feed.</del>
+					</li>
+				</ul>
+				<div class="sidebar-link"> 
+				{{if .IsAdmin }}
+				<a href="/admin/logout">Logout</a>
+				{{else}}
+				<a href="/blog/login">Login</a>
+				{{end}}
+				</div>
+			</div>

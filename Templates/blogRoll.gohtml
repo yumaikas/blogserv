@@ -1,0 +1,36 @@
+{{define "blogRoll"}}
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="/css/homepage.css" rel="stylesheet" type="text/css">
+		
+		<title>
+			Jungle Coder
+		</title>
+	</head>
+	<body>
+		<div class="headingBacker">
+			<a class="heading" href="/">Jungle Coder</a>
+			<p id="motto"><i>The musings of a third culture coder and missionary kid</i></p>
+		</div>
+		<div id="main">
+			<div class="sidebar"> {{template "sidebar" .}}
+				</div>
+			<div class="content left body">
+					{{/*The Model for this page is literally a list of articles. */}} 
+					{{range .}}
+					<h2>
+						<a class="title" href="/blog/{{.URL}}">{{.Title}}</a> 
+						{{if .IsAdmin }}
+						<a class="title" href="/admin/edit/{{.URL}}"> | (Edit)</a>
+						{{end}}
+					</h2>
+					{{/*The content will need to be valid html, but aware that it will be in an article*/}} 
+					{{preview .Content}}<a href="/blog/{{.URL}}" >Read more...</a>
+					<hr>
+					{{end}}
+			</div>
+		</div>
+	</body>
+</html>
+{{end}}

@@ -19,12 +19,18 @@ blockquote {
 
 /*This is the container element that houses everything outside of the title bar*/
 #main {
-	max-width: 850px;
+	max-width: 960px;
 	min-width: 800px;
 	margin-right: auto;
 	margin-left: auto;
 }
 
+.hidden {
+	visibility: collapse;
+}
+#epiceditor {
+	width: 600px;
+}
 .background {
   background-color: #013000;
 }
@@ -98,6 +104,14 @@ body {
 h2 {
 	font-family: "Lucida Bright", Georgia, serif;
 	border-bottom: 1px solid #ccc;
+	font-size: 14pt;
+}
+
+input.bigInput {
+	font-family: "Lucida Bright", Georgia, serif;
+	font-size: 14pt;
+	min-width: 500px;
+	border-radius: 3px;
 }
 h3 {
 	font-family: "Lucida Bright", Georgia, serif;

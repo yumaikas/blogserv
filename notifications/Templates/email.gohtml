@@ -1,0 +1,17 @@
+{{define "notification"}}
+
+<html>
+<style>
+	
+</style>
+
+Your blog has comments on the follwing articles:
+
+<ul>
+{{range $name, $comment := .}}
+<li>
+	<a href="">{{$name}}</a>
+</li>
+{{end}}
+</ul>
+</html>

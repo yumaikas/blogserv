@@ -1,26 +1,28 @@
 package main
 
 import (
-	secret "blogserv_secret"
+	"bufio"
 	"fmt"
+	md "github.com/russross/blackfriday"
 	"html/template"
 	"io"
 	"io/ioutil"
+	"net"
 	"strings"
 	"time"
+	arts "yumaikas/blogserv/blogArticles"
+	"yumaikas/blogserv/config"
+	"yumaikas/die"
 )
 
-//The Article Type holds
-type Article struct {
-	Title, URL, content string
-	//This conent doesn't come from my typing, it shouldn't be trusted.
-	Comments []Comment
-}
+var (
+	blogTemps template.Template
+)
 
 //Take the first two lines and use it for an article preview
-func (ar *Article) Preview() template.HTML {
+func Preview(s string) template.HTML {
 	var preview string
-	for idx, tx := range strings.Split(ar.content, "\n") {
+	for idx, tx := range strings.Split(s, "\n") {
 		//Only take 2 lines
 		if idx > 2 {
 			break
@@ -33,35 +35,32 @@ func (ar *Article) Preview() template.HTML {
 
 //Html escape the content of the article so that RSS readers can parse it.
 func (ar *Article) RssHTML() template.HTML {
-	rss := template.HTMLEscapeString(ar.content)
+	rss := template.HTMLEscapeString(ar.Content)
 	return template.HTML(rss)
 }
 
-func (ar *Article) Content() template.HTML {
-	return template.HTML(ar.content)
+//This content needs to be trusted
+func (ar *Article) HTMLContent() template.HTML {
+	ar.Content = string(md.MarkdownCommon([]byte(ar.Content)))
+	return template.HTML(ar.Content)
 }
 
-type articleList []Article
-type rssfeed []Article
+type articleList []arts.Article
+type rssfeed []arts.Article
 
 var (
-	article  template.Template
-	blogRoll template.Template
-	rssFeed  template.Template
+	goarticle  chan int
+	goblogroll chan int
+	gorssFeed  chan int
 )
 
-func (f rssfeed) render(out io.Writer) (err error) {
-	err = rssFeed.Execute(out, f)
-	return
-}
-
 func (ar *Article) render(out io.Writer) (err error) {
-	err = article.Execute(out, ar)
+	err = blogTemps.ExecuteTemplate(out, "blogPost", ar)
 	return
 }
 
 func (ars articleList) render(out io.Writer) (err error) {
-	err = blogRoll.Execute(out, ars)
+	err = blogTemps.ExecuteTemplate(out, "blogRoll", ars)
 	return
 }
 
@@ -76,47 +75,85 @@ func spaceTitleCase(str string) string {
 	}
 	return string(newTitle)
 }
+
+var reset chan int
+
+func listenForAdmin() {
+	reset = make(chan int)
+	l, err := net.Listen("tcp", "localhost:8000")
+	if err != nil {
+		panic(err.Error())
+	}
+	for {
+		c, err := l.Accept()
+		if err != nil {
+			c.Close()
+			continue
+		}
+		scn := bufio.NewScanner(c)
+		if scn.Scan() {
+			t := scn.Text()
+			switch t {
+			case "reset":
+				reset <- 0
+				fmt.Fprintln(c, "Reset sent")
+			default:
+			}
+		}
+		c.Close()
+	}
+}
+
 func template_init() {
-	article, blogRoll = template_load()
+	blogTemps = template_load()
 	timeout := time.Tick(5 * time.Minute)
 	for {
 		select {
+		case <-reset:
+			fmt.Println("resetting config and templates")
+			config.ReloadConfig()
+			blogTemps = template_load()
 		case <-timeout:
 			fmt.Println("refreshing templates")
-			article, blogRoll = template_load()
+			blogTemps = template_load()
 		}
 	}
 }
 
 //Prepare the templates for the server, then test
-func template_load() (template.Template, template.Template) {
-	//This function will make a fatal log if it fails, exiting the process
-	loadTemplate := func(file string) string {
-		//template path has a trailing slash so that file name
-		//doesn't need to have leading one
-		temp, err := ioutil.ReadFile(secret.TemplatePath + file)
-		templ := string(temp)
-		if err != nil {
-			//Without templates, the server can't run
-			panic(fmt.Errorf("The template load failed: %s", err.Error()))
-		}
-		return templ
-	}
+//TODO: generalize this so that it uses a config file to get the list of templates used, or just walks a directory.
+func template_load() template.Template {
 
+	//Panic on an error after logging, since templates are very important to the blog.
+	defer func() {
+		val := die.Log()
+		if val != nil {
+			panic(val)
+		}
+	}()
 	funcs := template.FuncMap{
 		"splitUpper": spaceTitleCase,
+		"preview":    Preview,
 	}
-	bp_temp := loadTemplate("blogPost.html")
-	br_temp := loadTemplate("blogRoll.html")
-	parseTemplate := func(title, text string) template.Template {
-		//Again, this is a fatal log if we have a failure.
-		templ, err := template.New(title).Funcs(funcs).Parse(text)
-		if err != nil {
-			panic(fmt.Sprintf("The template load faild %s", err.Error()))
-		}
-		return *templ
+	temps, err := template.New("sidebar").Funcs(funcs).Parse("")
+	die.OnErr(err)
+	//This function will make a fatal log if it fails, exiting the process
+	loadTemplate := func(file string) {
+		//template path has a trailing slash so that file name
+		//doesn't need to have leading one
+		temp, err := ioutil.ReadFile(config.TemplatePath() + file)
+		templ := string(temp)
+		die.OnErr(err)
+		//No name is needed here as the templates are expected to supply their own names.
+		_, err = temps.Parse(templ)
+		die.OnErr(err)
 	}
-	p_article := parseTemplate("ArticleTemplate", bp_temp)
-	p_blogRoll := parseTemplate("BlogRollTemplate", br_temp)
-	return p_article, p_blogRoll
+
+	loadTemplate("sidebar.gohtml")
+	loadTemplate("blogRoll.gohtml")
+	loadTemplate("blogPost.gohtml")
+	loadTemplate("Login.gohtml")
+	loadTemplate("editor.gohtml")
+
+	return *temps
 }

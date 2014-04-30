@@ -1,0 +1,964 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"ar",
+				"articleList	[]arts.Article ʈ"
+			],
+			[
+				"Is",
+				"IsPublished	bool ƒ"
+			],
+			[
+				"li",
+				"listArtswithPredicate	 ƒ"
+			],
+			[
+				"D",
+				"Draft	 Ɩ"
+			],
+			[
+				"Re",
+				"Redirect	 ƒ"
+			],
+			[
+				"art",
+				"articleList	[]arts.Article ʈ"
+			],
+			[
+				"at",
+				"arts	[]*ars ν"
+			],
+			[
+				"P",
+				"PublishStage	string ν"
+			],
+			[
+				"db",
+				"dbOpen	*sql.DB, error ƒ"
+			],
+			[
+				"Er",
+				"Err500	error ν"
+			],
+			[
+				"Po",
+				"PostFormValue	string ƒ"
+			],
+			[
+				"Fo",
+				"ParseForm	error ƒ"
+			],
+			[
+				"F",
+				"Fprint	n int, err error ƒ"
+			],
+			[
+				"edi",
+				"editSetup	 ƒ"
+			],
+			[
+				"flo",
+				"float"
+			],
+			[
+				"text",
+				"text-align"
+			],
+			[
+				"margin",
+				"margin-left"
+			],
+			[
+				"ma",
+				"margin-top"
+			],
+			[
+				"bo",
+				"border-bottom"
+			],
+			[
+				"l",
+				"left"
+			],
+			[
+				"co",
+				"color"
+			],
+			[
+				"cel",
+				"cellMap	map[point]GridCell ν"
+			],
+			[
+				"p",
+				"power	int ν"
+			],
+			[
+				"print",
+				"Println	n int, err error ƒ"
+			],
+			[
+				"json",
+				"jsonArticle	struct ʈ"
+			],
+			[
+				"js",
+				"jsonArticles	[]byte, err ƒ"
+			],
+			[
+				"j",
+				"jsonArticles	[]byte, err ƒ"
+			],
+			[
+				"C",
+				"Content	string ν"
+			],
+			[
+				"jso",
+				"jsonArticle	struct ʈ"
+			],
+			[
+				"Err",
+				"Err500	error ν"
+			],
+			[
+				"pr",
+				"property"
+			],
+			[
+				"con",
+				"controller	Ember.Controller.extend()"
+			],
+			[
+				"pos",
+				"post_id"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"Sca",
+				"Scanf	n int, err error ƒ"
+			],
+			[
+				"St",
+				"Stdin	*os.File ν"
+			],
+			[
+				"New",
+				"NewScanner	*bufio.Scanner ƒ"
+			],
+			[
+				"Scan",
+				"Scanln	n int, err error ƒ"
+			],
+			[
+				"E",
+				"err	error ν"
+			],
+			[
+				"rea",
+				"ReadFile	[]byte, error ƒ"
+			],
+			[
+				"Reso",
+				"ResponseWriter	interface ¡"
+			],
+			[
+				"Resp",
+				"ResponseWriter	interface ¡"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "main.go",
+			"settings":
+			{
+				"buffer_size": 5294,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "blogArticles/ArticleModel.go",
+			"settings":
+			{
+				"buffer_size": 7430,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "ArticleModel.go",
+			"settings":
+			{
+				"buffer_size": 3194,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "ArticleTemplate.go",
+			"settings":
+			{
+				"buffer_size": 3496,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/C/My Go/src/yumaikas/PostMerger/db.go",
+			"settings":
+			{
+				"buffer_size": 1922,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/My Go/src/yumaikas/die/die.go",
+			"settings":
+			{
+				"buffer_size": 605,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Templates/editor.gohtml",
+			"settings":
+			{
+				"buffer_size": 1792,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "Packages/GoSublime/GoSublime.sublime-build",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"ssh",
+				"Set Syntax: HTML"
+			],
+			[
+				"ip",
+				"Package Control: Install Package"
+			],
+			[
+				"ssmd",
+				"Set Syntax: Markdown"
+			],
+			[
+				"prev",
+				"Markdown Preview: Github Flavored Markdown: Preview in Browser"
+			],
+			[
+				"prevew",
+				"Markdown Preview: Python Markdown: Preview in Browser"
+			],
+			[
+				"Bau",
+				"Build: Pandown: Word Document"
+			],
+			[
+				"Pandown",
+				"Build: Pandown: Rich Text (RTF)"
+			],
+			[
+				"pand",
+				"Pandown: Build to Window"
+			],
+			[
+				"ssxml",
+				"Set Syntax: XML"
+			],
+			[
+				"Ssgos",
+				"Set Syntax: GoSublime: Go"
+			],
+			[
+				"ssC#",
+				"Set Syntax: C#"
+			],
+			[
+				"ssgo",
+				"Set Syntax: GoSublime: HTML"
+			],
+			[
+				"ssgot",
+				"Set Syntax: GoSublime: Template"
+			],
+			[
+				"ssg",
+				"Set Syntax: GoSublime: Go"
+			],
+			[
+				"ssgos",
+				"Set Syntax: GoSublime: Go"
+			],
+			[
+				"ssGos",
+				"Set Syntax: GoSublime: Go"
+			],
+			[
+				"IP",
+				"Package Control: Install Package"
+			],
+			[
+				"ssJs",
+				"Set Syntax: JSON"
+			],
+			[
+				"ssjs",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"ss ht",
+				"Set Syntax: HTML"
+			],
+			[
+				"ssem	",
+				"Set Syntax: EmberScript"
+			],
+			[
+				"I",
+				"Package Control: Install Package"
+			],
+			[
+				"SSPa",
+				"Set Syntax: Pascal"
+			],
+			[
+				"SSHT	",
+				"Set Syntax: HTML"
+			],
+			[
+				"ssGo",
+				"Set Syntax: Go"
+			],
+			[
+				"IP ",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 576.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); open(os.path.join(ipp, pf), 'wb').write(urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ','%20')).read()) "
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/The Boss/AppData/Roaming/Sublime Text 3/Packages/GoSublime/USAGE.md",
+		"/C/My Go/src/yumaikas/blogserv/Templates/creator.gohtml",
+		"/C/Users/The Boss/AppData/Roaming/Sublime Text 3/Packages/User/GoSublime.sublime-settings",
+		"/C/Users/The Boss/AppData/Roaming/Sublime Text 3/Packages/GoSublime/GoSublime.sublime-settings",
+		"/C/Users/The Boss/AppData/Roaming/Sublime Text 3/Packages/GoSublime/README.md",
+		"/C/Program Files (x86)/Steam/steamapps/common/Risk of Rain/Prefs.ini",
+		"/C/Journal/OneStrategyAgainstProcrastination.md",
+		"/C/Journal/Sloppieness.md",
+		"/C/Users/The Boss/Contacts/gen2.txt",
+		"/C/Users/The Boss/Contacts/thehighlander.txt",
+		"/C/My Go/src/github-me/RiemannSumsProject/Slides/Slides Outline.txt",
+		"/C/Journal/journal.md",
+		"/C/Journal/Support in Programming and Tech.md",
+		"/C/Users/The Boss/Documents/Passwords.kdbx",
+		"/C/Users/The Boss/Contacts/Twitter.txt",
+		"/C/Users/The Boss/Contacts/obscure.cmake",
+		"/C/Users/The Boss/Contacts/Phantasmogoria.iss",
+		"/C/Program Files (x86)/Steam/steamapps/common/Risk of Rain/Save.ini",
+		"/C/Users/The Boss/Contacts/regnode",
+		"/C/My Go/src/yumaikas/blogserv/Templates/NewPost.gohtml",
+		"/C/Users/The Boss/Documents/LOGOSothers.md",
+		"/C/My Go/src/github-me/RiemannSumsProject/Slides/Test.md",
+		"/C/Program Files (x86)/Steam/steamapps/common/Dark Forces/mapper.txt",
+		"/C/Users/The Boss/Documents/Blog Articles/WellFactored.mdown",
+		"/C/Users/The Boss/Desktop/Set CD path.reg",
+		"/C/Program Files (x86)/Steam/steamapps/common/Dark Forces/Dosbox.conf",
+		"/C/Program Files (x86)/Steam/steamapps/common/Star Wars Jedi Knight/32380_install.vdf",
+		"/C/Program Files (x86)/Steam/steamapps/common/Star Wars Jedi Knight/Resource/JK_.CD",
+		"/C/Users/The Boss/Downloads/1401.2499v1",
+		"/C/OpenAL/openal-soft-1.15.1/CMakeLists.txt",
+		"/C/OpenAL/openal-soft-1.15.1-bin/readme.txt",
+		"/C/OpenAL/openal-soft-1.15.1-bin/COPYING",
+		"/C/OpenAL/pax_global_header",
+		"/C/Users/The Boss/AppData/Roaming/Sublime Text 3/Packages/GoSublime/CHANGELOG.md",
+		"/C/My Go/src/github-me/RiemannSumsProject/Slides/RoughDraft.key/Metadata/BuildVersionHistory.plist",
+		"/C/My Go/src/yumaikas/RecusiveDomination/main.go",
+		"/C/Program Files (x86)/Steam/SteamApps/common/Risk of Rain/Save.ini",
+		"/C/Journal/Customers.xml",
+		"/C/Program Files (x86)/Steam/SteamApps/common/Risk of Rain/Save_backup.ini",
+		"/C/Program Files (x86)/Steam/userdata/163028183/214770/remote/save.dat",
+		"/C/My Go/src/yumaikas/LoopTest/main.go",
+		"/C/My Go/src/yumaikas/blogserv/Templates/sidebar.gohtml",
+		"/C/My Go/src/yumaikas/blogserv/rss.go",
+		"/C/Users/The Boss/Contacts/HigherThanOne.kix",
+		"/C/My Go/src/github-me/RiemannSumsProject/README.md",
+		"/C/MyC#/Shapes/Shapes.csproj",
+		"/C/MyC#/Shapes/combined.cs",
+		"/C/Users/The Boss/Documents/Blog Articles/MechanicalAndCreativeWork.post",
+		"/C/Users/The Boss/Documents/Blog Articles/Drafts/Jules.mdown",
+		"/C/Emberjs/starter-kit-1.2.0/starter-kit-1.2.0/TODO.txt",
+		"/C/config/config.json",
+		"/C/Users/The Boss/AppData/Roaming/Sublime Text 3/Packages/RegReplace/reg_replace.sublime-settings",
+		"/C/Users/The Boss/AppData/Roaming/Sublime Text 3/Packages/User/reg_replace.sublime-settings",
+		"/C/Users/The Boss/Pictures/LeftRiemann2.xml",
+		"/C/Users/The Boss/Documents/Emberjs/starter-kit-1.2.0/TODO.txt",
+		"/C/Users/The Boss/Documents/Emberjs/starter-kit-1.2.0/css/style.css",
+		"/C/Users/The Boss/Documents/Emberjs/starter-kit-1.2.0/index.html",
+		"/C/Users/The Boss/Documents/Emberjs/starter-kit-1.2.0/js/app.js",
+		"/C/Go/src/blogserv/outdoor/index.html",
+		"/C/Users/The Boss/Documents/Blog Articles/Drafts/OutlineForPosts.mdown",
+		"/C/My Go/src/compiler/cradle.go",
+		"/C/Users/The Boss/Documents/Visual Studio 2012/Projects/RiemannApprox/ReimannSums/readme.md",
+		"/C/Users/The Boss/Documents/Blog Articles/Drafts/CodingAReimannSum",
+		"/C/Users/The Boss/Documents/Blog Articles/Drafts/TaleOfALateNightCollegeProject.mdown",
+		"/C/Users/The Boss/Documents/Visual Studio 2012/Projects/RiemannApprox/ReimannSums/packages/.gitignore",
+		"/C/Users/The Boss/Documents/Visual Studio 2012/Projects/RiemannApprox/ReimannSums/RiemannApprox.sln",
+		"/C/Users/The Boss/Documents/ZhengHo.mdown",
+		"/C/Users/The Boss/AppData/Roaming/Sublime Text 3/Installed Packages/WordCount.sublime-package",
+		"/C/Users/The Boss/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/wp-search/test..html",
+		"/C/Go/src/blogserv/outdoornames.csv"
+	],
+	"find":
+	{
+		"height": 22.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"listArtswithPredicate",
+			"tx",
+			"		}()",
+			"db",
+			"DB",
+			"db",
+			"DB",
+			"db",
+			"\n}",
+			"An",
+			"an",
+			"An",
+			"GoPath",
+			"pseudo",
+			"loginRoute",
+			"<option>",
+			"239",
+			"</option>",
+			".+pm.+pm.+",
+			"Room 2\\d{2}.+Wed",
+			"<(br|td[^>]*)>",
+			"Bldg K<br> Room \\d{3}.+?\\d{1,2}:\\d\\d [AP]M - \\d{1,2}:\\d\\d.+?Day\\(s\\):[^<]+",
+			"Room \\d{3}.+?\\d{1,2}:\\d\\d [AP]M - \\d{1,2}:\\d\\d",
+			"tr(.*?wed.*?BLDG k.*?2\\d\\d.*?)</tr>",
+			"tr(.*?wed.*?K.*?2\\d\\d.*?)</tr>",
+			"tr(.*?wed.*?k.*?2\\d\\d.*?)</tr>",
+			"tr(.*Wed.*)</tr>",
+			"Wed",
+			"Day: Wed",
+			" (",
+			" .",
+			"<[^>]+>",
+			"div",
+			"<div class=\"sidebar-link\"><a href=\"/\">Home</a></div>\n\n				<div class=\"sidebar-link\"><a href=\"/blog/AboutMe\">About Me</a></div>\n				<div class=\"sidebar-link\"><a href=\"/blog/feed.xml\">RSS feed</a></div>",
+			"(.+Box)",
+			"},\n",
+			"	}",
+			"namespace Shapes\\n\\{",
+			"using.+",
+			"\\n",
+			"\\w{3} \\d{2}\\b",
+			"Zheng He",
+			"\\w+",
+			"x",
+			"function",
+			"proc\\w+",
+			"end;",
+			"begin",
+			"Read",
+			"\\{",
+			"\\t",
+			"^(\\d+)\\s+([\\d\\.]+\\s+){12}([\\d\\.]+).+",
+			"^(\\d+)\\s+([\\d\\.]+\\s+){12}",
+			"^([\\d\\.]+\\s+){13}",
+			". ",
+			"\\d+\\.",
+			"([\\w\\s]+)\\n\\1",
+			"-.+",
+			"\\d+\\.\\s+",
+			"^",
+			"^\\s+",
+			"\n	",
+			"	}",
+			"uploadFile"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+			"\\n",
+			"span",
+			"\\1 hello",
+			"",
+			", ",
+			"Cheng Ho",
+			"(2)",
+			"(-sqrt2)",
+			"(sqrt2)",
+			"(x)",
+			"//{",
+			"\\1    \\3",
+			"",
+			"\\1",
+			""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "main.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5294,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4390,
+								4390
+							]
+						],
+						"settings":
+						{
+							"WordCountShouldRun": true,
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2072.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "blogArticles/ArticleModel.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7430,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								814,
+								814
+							]
+						],
+						"settings":
+						{
+							"WordCountShouldRun": true,
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 210.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "ArticleModel.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3194,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								995,
+								995
+							]
+						],
+						"settings":
+						{
+							"WordCountShouldRun": true,
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 215.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "ArticleTemplate.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3496,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								970,
+								970
+							]
+						],
+						"settings":
+						{
+							"WordCountShouldRun": true,
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/C/My Go/src/yumaikas/PostMerger/db.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1922,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1867,
+								846
+							]
+						],
+						"settings":
+						{
+							"WordCountShouldRun": true,
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 47.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 5,
+					"file": "/C/My Go/src/yumaikas/die/die.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 605,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								605,
+								605
+							]
+						],
+						"settings":
+						{
+							"WordCountShouldRun": true,
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"WordCountShouldRun": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "Templates/editor.gohtml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1792,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								841,
+								841
+							]
+						],
+						"settings":
+						{
+							"WordCountShouldRun": true,
+							"syntax": "Packages/GoSublime/syntax/GoSublime-HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 16.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 34.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.5,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.9o://C:\\Go\\src\\blogserv":
+	{
+		"height": 100.0
+	},
+	"output.9o://C:\\Go\\src\\blogserv\\outdoor":
+	{
+		"height": 100.0
+	},
+	"output.9o://C:\\Go\\src\\blogserv\\test":
+	{
+		"height": 100.0
+	},
+	"output.9o://C:\\My Go\\src\\compiler":
+	{
+		"height": 100.0
+	},
+	"output.9o://C:\\My Go\\src\\yumaikas\\100000Test":
+	{
+		"height": 416.0
+	},
+	"output.9o://C:\\My Go\\src\\yumaikas\\LoopTest":
+	{
+		"height": 88.0
+	},
+	"output.9o://C:\\My Go\\src\\yumaikas\\PostMerger":
+	{
+		"height": 118.0
+	},
+	"output.9o://C:\\My Go\\src\\yumaikas\\RecusiveDomination":
+	{
+		"height": 161.0
+	},
+	"output.9o://C:\\My Go\\src\\yumaikas\\blogserv":
+	{
+		"height": 118.0
+	},
+	"output.9o://C:\\My Go\\src\\yumaikas\\blogserv\\blogArticles":
+	{
+		"height": 100.0
+	},
+	"output.9o://C:\\My Go\\src\\yumaikas\\die":
+	{
+		"height": 100.0
+	},
+	"output.9o://C:\\Users\\The Boss\\AppData\\Roaming\\Sublime Text 3\\Packages":
+	{
+		"height": 118.0
+	},
+	"output.9o://C:\\Users\\The Boss\\Documents\\Blog Articles":
+	{
+		"height": 118.0
+	},
+	"output.GoSublime-main-output":
+	{
+		"height": 100.0
+	},
+	"output.GsComplete.completion-hint-output":
+	{
+		"height": 100.0
+	},
+	"output.GsDoc-output-output":
+	{
+		"height": 100.0
+	},
+	"output.exec":
+	{
+		"height": 118.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "my-project-blogserv.sublime-project",
+	"replace":
+	{
+		"height": 40.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"cradle.go",
+				"C:\\My Go\\src\\compiler\\cradle.go"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 297.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

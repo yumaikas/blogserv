@@ -1,10 +1,11 @@
-
+<!DOCTYPE html>
 <html>
 	<head>
 		<link href="/css/homepage.css" rel="stylesheet" type="text/css">
-		
+		<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+		<script type="text/javascript" src="/js/prettify.js"></script>
 		<title>
-			Jungle Coder
+			{{.Title}} | Jungle Coder
 		</title>
 	</head>
 	<body>
@@ -21,6 +22,7 @@
 				<p>
 					Welcome to my blog. This website/blog is still under construction, so there are a few rough edges.
 				</p>
+				<p>UPDATE: Now with https, so that security is increased.<p>
 				<p>UPDATE: RSS feed added, one edge smoothed</p>
 				<p>
 					To come as my <a href="http://www.catb.org/jargon/html/C/copious-free-time.html">copious free time</a> allows:
@@ -33,17 +35,28 @@
 				</ul>
 			</div>
 			</div>
+			<form>
 			<div class="content left body">
-				{{/*The Model for this page is literally a list of articles. */}} 
-				{{range .}}
-				<h2>
-					<a class="title" href="/blog/{{.URL}}">{{.Title}}</a>
-				</h2>
-				{{/*The content will need to be valid html, but aware that it will be in an article*/}} 
-				{{.Preview}}<a href="/blog/{{.URL}}" >Read more...</a>
-				<hr></hr>
-				{{end}}
+				<label for="title">Title</label>
+				<input id="title" Name="Title" type="Text"/>
 			</div>
-		</div>
+			<div id="preview">
+				
+			</div>
+			<form>
+			<div class="content left">
+				<form action="/submitComment/{{.URL}}" method="post" id="bottomComment">
+					<fieldset>
+						<textarea name="Comment" id="comment" cols="30" rows="10" placeholder="What did you want to say?...">
+	</textarea><br>
+						Email:*<input type="text" name="email"><br>
+						Name:*<input type="text" name="author"><br>
+						Reqired fields are marked with a '*'<br>
+						<input type="submit" value="Submit">
+					</fieldset>
+				</form>
+			</div>
+	</div>
 	</body>
 </html>
+

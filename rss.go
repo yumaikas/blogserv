@@ -21,10 +21,11 @@ func renderFeed(w io.Writer) error {
 	}
 	items := make([]*feeds.Item, 0)
 	for _, ar := range ars {
+
 		i := &feeds.Item{
 			Title:       ar.Title,
-			Link:        ar.RSSLink(),
-			Description: ar.content,
+			Link:        Article(ar).RSSLink(),
+			Description: ar.Content,
 		}
 		items = append(items, i)
 	}
@@ -38,7 +39,7 @@ func renderFeed(w io.Writer) error {
 	return nil
 }
 
-func (ar *Article) RSSLink() *feeds.Link {
+func (ar Article) RSSLink() *feeds.Link {
 	//The website name is currently hardcoded. This will need to change in the future
 	url := "http://www.junglecoder.com/blog/" + ar.URL
 	return &feeds.Link{Href: url}

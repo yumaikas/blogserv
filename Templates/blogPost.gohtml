@@ -1,6 +1,11 @@
+{{define "blogPost"}}
+{{$isAdmin := .IsAdmin}}
+<!DOCTYPE html>
 <html>
 	<head>
 		<link href="/css/homepage.css" rel="stylesheet" type="text/css">
+		<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+		<script type="text/javascript" src="/js/prettify.js"></script>
 		<title>
 			{{.Title}} | Jungle Coder
 		</title>
@@ -12,33 +17,20 @@
 		</div>
 		<div id="main">
 			<div class="sidebar">
-				<div class="content">
-				<div class="sidebar-link"><a href="/">Home</a></div>
-				<div class="sidebar-link"><a href="/blog/AboutMe">About Me</a></div>
-				<div class="sidebar-link"><a href="/blog/feed.xml">RSS feed</a></div>
-				<p>
-					Welcome to my blog. This website/blog is still under construction, so there are a few rough edges.
-				</p>
-				<p>UPDATE: RSS feed added, one edge smoothed</p>
-				<p>
-					To come as my <a href="http://www.catb.org/jargon/html/C/copious-free-time.html">copious free time</a> allows:
-				</p>
-				<ul>
-					<li>Archive list of blog posts and date based permalinks
-					</li>
-					<li><del>RSS feed.</del>
-					</li>
-				</ul>
-				</div>
+			{{template "sidebar" .}}
 			</div>
 			<div class="content left body">
 				<h2>
-					{{.Title}}
+					{{.Title}} {{if $isAdmin}} | <a href="../admin/edit/{{.URL}}">(Edit)</a> {{end}}
 				</h2>
-				<a>Next</a>
-				<a>Previous</a>
 				{{/*The content will need to be valid html, but aware that it will be in an article*/}} 
-				{{.Content}}
+				{{.HTMLContent}}
+				{{if .Previous.URL}}
+					<div>Previously: <a href="/blog/{{.Previous.URL}}">{{.Previous.Title}}</a></div>
+				{{end}}
+				{{if .Next.URL}}
+					<div>Next: <a href="/blog/{{.Next.URL}}">{{.Next.Title}}</a></div>
+				{{end}}
 			</div>
 			<div class="content left">
 				<h3>
@@ -46,10 +38,15 @@
 				</h3>{{range .Comments}}
 				<h4>
 					{{.UserName}}
+					{{if $isAdmin}}
+					(Remove comment)
+					{{end}}
 				</h4>
 				<p>
 					{{.Content}}
-				</p>{{else}} There are no comments for this article yet. {{end}}
+				</p>
+				{{else}} There are no comments for this article yet. 
+				{{end}}
 			</div>
 			<div class="content left">
 				<form action="/submitComment/{{.URL}}" method="post" id="bottomComment">
@@ -66,3 +63,4 @@
 	</div>
 	</body>
 </html>
+{{end}}

@@ -24,7 +24,7 @@ To set it up on your VPS/server you will need to at least do the following:
 
 1- Make sure that you have Sqlite3 and golang installed. 
 
-2- Run `go get github.com/yumaikas/blogserv`, `go get github.com/yumaikas/die` (provides a post adding command line command, currenty the only way to add an article without editing the db file)
+2- Run `go get github.com/yumaikas/blogserv` and `go get github.com/yumaikas/die`
 
 3- Create a config file with the following form:
 

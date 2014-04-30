@@ -17,14 +17,22 @@ Choices currently made for this engine:
 * Hand rolled, Akismet filtered comments 
 * Simple theme 
 * Low amount of dynamisim
-* Powered by a Sqlite file (this can change, just for simplicities sake)
-* Log to stderr
+* Powered by a Sqlite file 
+* Log to stderr, redirect when launching from cmd line
 
 To set it up on your VPS/server you will need to at least do the following:
 
 1- Make sure that you have Sqlite3 and golang installed. 
 
-2- Run `go get github.com/yumaikas/blogserv` and `go get github.com/yumaikas/die`
+2- Run `go get` for the following dependencies 
+
+	code.google.com/p/go.crypto/bcrypt
+ 	github.com/gorilla/feeds
+ 	github.com/russross/blackfriday
+ 	github.com/tgascoigne/akismet
+ 	github.com/yumaikas/blogserv/config
+ 	github.com/yumaikas/blogserv/WebAdmin
+ 	github.com/yumaikas/die
 
 3- Create a config file with the following form:
 
@@ -33,8 +41,8 @@ To set it up on your VPS/server you will need to at least do the following:
   "AkismetKey": "KeyHere",
   "WebRoot": "$GOPATH/github.com/yumaikas/blogserv/webroot/",
   "DBPath": "yourDBfileLocation",
-  "TemplatePath": "TheLocationOfYourTemplates",
-  "PostPath": "TheLocationOfPostMdownFiles",
+  "TemplatePath": "$GOPATH/github.com/yumaikas/blobserv/Templates",
+  "PostPath": "",
   "NotificationConfig" : {
 	"EmailAddress": "",
 	"ToBeNotified": ["tobenotifed@gmail.com"],
@@ -68,3 +76,4 @@ To set it up on your VPS/server you will need to at least do the following:
 
 ```
 
+6- Run `go install` in `blogserv/admin`, `blogserv/postMerger`, and `blogserv`

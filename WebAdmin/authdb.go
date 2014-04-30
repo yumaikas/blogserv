@@ -3,12 +3,13 @@
 package WebAdmin
 
 import (
-	"code.google.com/p/go.crypto/bcrypt"
 	"database/sql"
 	"errors"
 	"fmt"
+
+	"code.google.com/p/go.crypto/bcrypt"
 	_ "github.com/mattn/go-sqlite3"
-	"yumaikas/blogserv/config"
+	"github.com/yumaikas/blogserv/config"
 )
 
 //Fixing in general: Add code to create a record for a user if said user doesn't exist

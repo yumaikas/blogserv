@@ -179,7 +179,7 @@
 			"file": "main.go",
 			"settings":
 			{
-				"buffer_size": 5294,
+				"buffer_size": 5826,
 				"line_ending": "Unix"
 			}
 		},
@@ -187,7 +187,7 @@
 			"file": "blogArticles/ArticleModel.go",
 			"settings":
 			{
-				"buffer_size": 7430,
+				"buffer_size": 7484,
 				"line_ending": "Unix"
 			}
 		},
@@ -195,7 +195,7 @@
 			"file": "ArticleModel.go",
 			"settings":
 			{
-				"buffer_size": 3194,
+				"buffer_size": 3255,
 				"line_ending": "Unix"
 			}
 		},
@@ -203,7 +203,7 @@
 			"file": "ArticleTemplate.go",
 			"settings":
 			{
-				"buffer_size": 3496,
+				"buffer_size": 3529,
 				"line_ending": "Unix"
 			}
 		},
@@ -564,15 +564,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5294,
+						"buffer_size": 5826,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4390,
-								4390
+								0,
+								0
 							]
 						],
 						"settings":
@@ -594,15 +594,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7430,
+						"buffer_size": 7484,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								814,
-								814
+								0,
+								0
 							]
 						],
 						"settings":
@@ -624,15 +624,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3194,
+						"buffer_size": 3255,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								995,
-								995
+								0,
+								0
 							]
 						],
 						"settings":
@@ -654,15 +654,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3496,
+						"buffer_size": 3529,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								970,
-								970
+								0,
+								0
 							]
 						],
 						"settings":
@@ -727,8 +727,8 @@
 						"selection":
 						[
 							[
-								605,
-								605
+								171,
+								171
 							]
 						],
 						"settings":

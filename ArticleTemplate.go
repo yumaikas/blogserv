@@ -10,9 +10,9 @@ import (
 	"net"
 	"strings"
 	"time"
-	arts "yumaikas/blogserv/blogArticles"
-	"yumaikas/blogserv/config"
-	"yumaikas/die"
+	arts "github.com/yumaikas/blogserv/blogArticles"
+	"github.com/yumaikas/blogserv/config"
+	"github.com/yumaikas/die"
 )
 
 var (

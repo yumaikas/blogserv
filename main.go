@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"mime"
 	"net/http"
-	"yumaikas/blogserv/WebAdmin"
-	arts "yumaikas/blogserv/blogArticles"
-	"yumaikas/blogserv/config"
+
+	"github.com/yumaikas/blogserv/WebAdmin"
+	arts "github.com/yumaikas/blogserv/blogArticles"
+	"github.com/yumaikas/blogserv/config"
 )
 
 var (
@@ -25,19 +26,27 @@ func init() {
 	//pIf any of these functions fail, we aren't ready for the server to run.
 	//They all call log.Fatal(), so the user will get a warning when they run.
 	//akismet_init()
-	mime.AddExtensionType(".application", "application/x-ms-application")
-	mime.AddExtentionType(".manifest", "application/x-ms-manifest")
-	mime.AddExtentionType(".deploy", "application/octet-stream")
-	mime.AddExtentionType(".msp", "application/octet-stream")
-	mime.AddExtentionType(".msu", "application/octet-stream")
-	mime.AddExtentionType(".vsto", "application/x-ms-vsto")
-	mime.AddExtentionType(".xaml", "application/xaml+xml")
-	mime.AddExtentionType(".xbap", "application/x-ms-xbap")
+
 	go template_init()
 	go listenForAdmin()
 }
 
+func addClickOnceMimeTypes() {
+	//These extensions are to make ClickOnce deployments work properly, so that
+	//Chrome and Firefox will work corretly with the.
+	mime.AddExtensionType(".application", "application/x-ms-application")
+	mime.AddExtensionType(".manifest", "application/x-ms-manifest")
+	mime.AddExtensionType(".deploy", "application/octet-stream")
+	mime.AddExtensionType(".msp", "application/octet-stream")
+	mime.AddExtensionType(".msu", "application/octet-stream")
+	mime.AddExtensionType(".vsto", "application/x-ms-vsto")
+	mime.AddExtensionType(".xaml", "application/xaml+xml")
+	mime.AddExtensionType(".xbap", "application/x-ms-xbap")
+}
 func main() {
+	//Needs to be called inside main() for some reason. I suspect that it has
+	//something to do with initization order, but am not sure.
+	addClickOnceMimeTypes()
 	//Force a defualt main page
 	http.HandleFunc("/", root)
 	http.HandleFunc("/index.html", home)

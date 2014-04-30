@@ -3,12 +3,13 @@ package main //blogservModels
 import (
 	"errors"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/tgascoigne/akismet"
 	"log"
 	"net/http"
-	arts "yumaikas/blogserv/blogArticles"
-	"yumaikas/blogserv/config"
+
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/tgascoigne/akismet"
+	arts "github.com/yumaikas/blogserv/blogArticles"
+	"github.com/yumaikas/blogserv/config"
 )
 
 var (

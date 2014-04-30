@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
+
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tgascoigne/akismet"
-	"log"
-	"yumaikas/blogserv/config"
-	"yumaikas/die"
+	"github.com/yumaikas/blogserv/config"
+	"github.com/yumaikas/die"
 )
 
 type Comment struct {

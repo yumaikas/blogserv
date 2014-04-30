@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	arts "yumaikas/blogserv/blogArticles"
+
+	arts "github.com/yumaikas/blogserv/blogArticles"
 )
 
 type jsonArticle struct {

@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"net"
 	"net/smtp"
-	"yumaikas/blogserv/config"
-	"yumaikas/die"
+
+	"github.com/yumaikas/blogserv/config"
+	"github.com/yumaikas/die"
 
 	"code.google.com/p/go.crypto/bcrypt"
 	_ "github.com/mattn/go-sqlite3"

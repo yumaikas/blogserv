@@ -1,6 +1,6 @@
 #Blogserv - Yet another blog engine in golang.
 
-This is the software that powers https://junglecoder.com. It is currently only intended for personal use by those who are interested in go. 
+This is the software that powers https://junglecoder.com. It is currently only intended for personal use by those who are interested in go. It runs on both windows and linux with only changing an environment variable for configurations.
 
 Currently the website is running an older version sans a lot of the admin interface that this version is working on.
 The sync with the server will come once I finish a few features:
@@ -20,9 +20,10 @@ Choices currently made for this engine:
 * Powered by a Sqlite file 
 * Log to stderr, redirect when launching from cmd line
 
+##Current state of deployment (to be made easier)
 To set it up on your VPS/server you will need to at least do the following:
 
-1- Make sure that you have Sqlite3 and golang installed. 
+1- Make sure that you have Sqlite3 (the `libsqlite3-dev` package on apt) and [golang](http://golang.org/doc/install) installed. 
 
 2- Run `go get` for the following dependencies 
 
@@ -77,3 +78,13 @@ To set it up on your VPS/server you will need to at least do the following:
 ```
 
 6- Run `go install` in `blogserv/admin`, `blogserv/postMerger`, and `blogserv`
+
+7- Create the site's first article in the following form (sample title), saving it as an `*.mdown` file in the directory that you put in the config for blog articles:
+
+	"URL":"AboutMe"
+	"Title":"About Me"
+	Text:{
+		The blog works!
+		}:Text
+
+8- Run `postMerger`

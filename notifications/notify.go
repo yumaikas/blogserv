@@ -9,7 +9,7 @@ import (
 
 	arts "github.com/yumaikas/blogserv/blogArticles"
 	"github.com/yumaikas/blogserv/config"
-	"github.com/yumaikas/die"
+	die "github.com/yumaikas/golang-die"
 )
 
 var comments = make(chan comment)
@@ -25,7 +25,7 @@ type emailEntry struct {
 }
 
 func NotifyComment(c arts.Comment, email, URL, ArtName string, r *http.Request) {
-	submission := comment{c, email, r.RemoteAddr, r.URL, ArtName}
+	submission := comment{c, email, r.RemoteAddr, r.URL.RequestURI(), ArtName}
 	comments <- submission
 }
 
@@ -42,7 +42,6 @@ func sendEmail(comments []comment) {
 		if ar, found := articles[c.URL]; found {
 			ar = append(ar, c)
 		} else {
-			zi
 			articles[c.URL] = emailEntry{
 				c.ArticleName,
 				c.URL,

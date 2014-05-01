@@ -10,7 +10,7 @@ import (
 	"net/smtp"
 
 	"github.com/yumaikas/blogserv/config"
-	"github.com/yumaikas/die"
+	die "github.com/yumaikas/golang-die"
 
 	"code.google.com/p/go.crypto/bcrypt"
 	_ "github.com/mattn/go-sqlite3"

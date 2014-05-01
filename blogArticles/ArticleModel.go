@@ -9,7 +9,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tgascoigne/akismet"
 	"github.com/yumaikas/blogserv/config"
-	"github.com/yumaikas/die"
+	die "github.com/yumaikas/golang-die"
 )
 
 type Comment struct {

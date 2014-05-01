@@ -34,7 +34,7 @@ To set it up on your VPS/server you will need to at least do the following:
  	github.com/tgascoigne/akismet
  	github.com/yumaikas/blogserv/config
  	github.com/yumaikas/blogserv/WebAdmin
- 	github.com/yumaikas/die
+ 	github.com/yumaikas/golang-die
 
 3- Create a config file with the following form:
 

@@ -3,16 +3,17 @@ package main
 import (
 	"bufio"
 	"fmt"
-	md "github.com/russross/blackfriday"
 	"html/template"
 	"io"
 	"io/ioutil"
 	"net"
 	"strings"
 	"time"
+
+	md "github.com/russross/blackfriday"
 	arts "github.com/yumaikas/blogserv/blogArticles"
 	"github.com/yumaikas/blogserv/config"
-	"github.com/yumaikas/die"
+	die "github.com/yumaikas/golang-die"
 )
 
 var (

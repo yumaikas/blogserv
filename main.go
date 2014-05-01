@@ -190,7 +190,7 @@ func editSubmit(w http.ResponseWriter, r *http.Request) {
 	art := arts.Article(ar)
 	art.Content = article
 	art.Title = title
-	art.PublishType = "Draft"
+	art.PublishStage = "Draft"
 }
 
 //This function needs to be auth verified before calling.

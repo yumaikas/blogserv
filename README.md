@@ -91,5 +91,5 @@ To set it up on your VPS/server you will need to at least do the following:
 
 9- Run `nohup blogserv &> log` to test the server on linux, or just run `blogserv.exe` if on Windows. 
 
-10-  If all that worked, the blog should be listeing on port 8080. 
+10-  If all that worked, the blog should be listeing on port 8080.
 

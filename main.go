@@ -183,15 +183,14 @@ func editSubmit(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, Err500.Error())
 		return
 	}
-
 	r.ParseForm()
 
 	title := r.PostFormValue("Title")
 	article := r.PostFormValue("article")
-
-	ar.Content = article
-	ar.Title = title
-
+	art := arts.Article(ar)
+	art.Content = article
+	art.Title = title
+	art.PublishType = "Draft"
 }
 
 //This function needs to be auth verified before calling.

@@ -1,8 +1,9 @@
-#Blogserv - Yet another blog engine in golang.
+#Blogserv - Work In Progress blog engine in golang.
 
-This is the software that powers https://junglecoder.com. It is currently only intended for personal use by those who are interested in go. It runs on both windows and linux with only changing an environment variable for configurations.
+This is the software that powers https://junglecoder.com. It is currently only intended for personal use by those who are interested in go. It runs on both windows and linux with only changing an environment variable for configurations. 
 
 Currently the website is running an older version sans a lot of the admin interface that this version is working on.
+
 The sync with the server will come once I finish a few features:
 
 * Editing articles 
@@ -42,7 +43,7 @@ To set it up on your VPS/server you will need to at least do the following:
   "AkismetKey": "KeyHere",
   "WebRoot": "$GOPATH/github.com/yumaikas/blogserv/webroot/",
   "DBPath": "yourDBfileLocation",
-  "TemplatePath": "$GOPATH/github.com/yumaikas/blobserv/Templates",
+  "TemplatePath": "$GOPATH/github.com/yumaikas/blogserv/Templates",
   "PostPath": "",
   "NotificationConfig" : {
 	"EmailAddress": "",

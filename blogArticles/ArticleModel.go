@@ -89,7 +89,7 @@ func SaveArticle(ar Article) (retErr error) {
 	defer func() {
 		err := die.Log()
 		if err != nil {
-			fmt.Println("An error occured while trying to save articles")
+			fmt.Println("An error occured while trying to save an article")
 			retErr = err.(error)
 		}
 	}()
@@ -104,9 +104,11 @@ func SaveArticle(ar Article) (retErr error) {
 		//create article
 	case 1:
 		//update article
+		update(ar)
 	default:
 		die.OnErr(errors.New("More than on article for a URL. Database integrity is compromised"))
 	}
+
 	return
 }
 
@@ -148,9 +150,9 @@ func insert(a Article) {
 	fmt.Println(a.Title)
 	fmt.Println(a.URL)
 	res, err := tx.Exec(`
-	Insert into Articles(Title, Content, URL) 
-	values (?, ?, ?)
-	`, a.Title, a.Content, a.URL)
+	Insert into Articles(Title, Content, URL, PublishStage) 
+	values (?, ?, ?, ?)
+	`, a.Title, a.Content, a.URL, a.PublishStage)
 	if err != nil {
 		panic(err)
 	}

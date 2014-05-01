@@ -176,7 +176,6 @@ func edit(w http.ResponseWriter, r *http.Request) {
 }
 
 func editSubmit(w http.ResponseWriter, r *http.Request) {
-
 	articleTitle := r.URL.Path[len("/admin/edit/"):]
 	ar, err := fillArticle(articleTitle)
 	if err != nil {
@@ -192,6 +191,7 @@ func editSubmit(w http.ResponseWriter, r *http.Request) {
 
 	ar.Content = article
 	ar.Title = title
+
 }
 
 //This function needs to be auth verified before calling.

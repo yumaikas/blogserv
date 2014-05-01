@@ -77,7 +77,7 @@ To set it up on your VPS/server you will need to at least do the following:
 
 ```
 
-6- Run `go install` in `blogserv/admin`, `blogserv/postMerger`, and `blogserv`
+6- Run `go build` and `go install` in `blogserv/admin`, `blogserv/postMerger`, and `blogserv`
 
 7- Create the site's first article in the following form (sample title), saving it as an `*.mdown` file in the directory that you put in the config for blog articles:
 
@@ -87,4 +87,9 @@ To set it up on your VPS/server you will need to at least do the following:
 		The blog works!
 		}:Text
 
-8- Run `postMerger`
+8- Run `postMerger` to add the article to the website.
+
+9- Run `nohup blogserv &> log` to test the server on linux, or just run `blogserv.exe` if on Windows. 
+
+10-  If all that worked, the blog should be listeing on port 8080. 
+

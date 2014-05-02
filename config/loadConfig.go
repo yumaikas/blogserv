@@ -24,10 +24,10 @@ type blogservConfig struct {
 	DbPath            string             "DbPath"
 	TemplatePath      string             "TemplatePath"
 	PostPath          string             "PostPath"
-	EmailNotifyConfig notificationConfig `json:"NotificationConfig"`
+	EmailNotifyConfig NotificationConfig `json:"NotificationConfig"`
 }
 
-type notificationConfig struct {
+type NotificationConfig struct {
 	EmailAddress string           "EmailAddress"
 	ToBeNotified []string         "ToBeNotified"
 	PlainAuth    NotificaitonAuth "PlainAuth"

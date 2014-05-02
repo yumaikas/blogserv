@@ -29,8 +29,11 @@ func NotifyComment(c arts.Comment, email, URL, ArtName string, r *http.Request) 
 	comments <- submission
 }
 
+var emailTemplate *template.Template
+
 func init() {
-	temp, err := template.ParseFiles("email.gohtml")
+	var err error
+	emailTemplate, err = template.ParseFiles("email.gohtml")
 	//Die on a failed template parse.
 	die.OnErr(err)
 	go notifyLoop()
@@ -38,20 +41,15 @@ func init() {
 
 func sendEmail(comments []comment) {
 	articles := make(map[string][]comment)
-	for _, c := range comment {
+	for _, c := range comments {
 		if ar, found := articles[c.URL]; found {
 			ar = append(ar, c)
 		} else {
-			articles[c.URL] = emailEntry{
-				c.ArticleName,
-				c.URL,
-				make([]comment, 0),
-			}
-			articles.Comments = append(articles.Comments, c)
+			articles[c.URL] = []comment{c}
 		}
 	}
-	auth, host := config.EmailAuth()
-	smtp.SendMail(host, config.EmailAuth(), "slaveofyumaikas@gmail.com", to, []byte("Test Email"))
+	auth := config.EmailAuth()
+	smtp.SendMail(auth.HostServer, auth.Auth, auth.FromEmail, auth.ToBeNotified, []byte("Test Email"))
 }
 
 func notifyLoop() {

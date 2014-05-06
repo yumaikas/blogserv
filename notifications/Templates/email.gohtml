@@ -1,17 +1,23 @@
-{{define "notification"}}
+{{define "notification"}}Content-Type: text/html
+To: yumaikas94@gmail.com
+{{/*LOCALIZE*/}}Subject: New comments on your blog!
 
 <html>
 <style>
-	
 </style>
 
+<p>
 Your blog has comments on the follwing articles:
+</p>
 
 <ul>
 {{range $name, $comment := .}}
 <li>
-	<a href="">{{$name}}</a>
+	{{/*LOCALIZE*/}}
+	<a href="https://junglecoder.com/blog/{{$name}}">{{$name}}</a>
+	There are {{len $comment}} comments on the article.
 </li>
 {{end}}
 </ul>
 </html>
+{{end}}

@@ -1,7 +1,8 @@
 package notifications
 
 import (
-	_ "fmt"
+	"bytes"
+	"fmt"
 	"html/template"
 	"net/http"
 	"net/smtp"
@@ -12,7 +13,7 @@ import (
 	die "github.com/yumaikas/golang-die"
 )
 
-var comments = make(chan comment)
+var commentChan = make(chan comment)
 
 type comment struct {
 	arts.Comment
@@ -26,30 +27,44 @@ type emailEntry struct {
 
 func NotifyComment(c arts.Comment, email, URL, ArtName string, r *http.Request) {
 	submission := comment{c, email, r.RemoteAddr, r.URL.RequestURI(), ArtName}
-	comments <- submission
+	commentChan <- submission
 }
 
 var emailTemplate *template.Template
 
 func init() {
 	var err error
-	emailTemplate, err = template.ParseFiles("email.gohtml")
+	emailTemplate, err = template.ParseFiles("Templates/email.gohtml")
 	//Die on a failed template parse.
 	die.OnErr(err)
 	go notifyLoop()
 }
 
-func sendEmail(comments []comment) {
+func sendEmail(toNotify []comment) {
+	defer func() {
+		if die.Log() != nil {
+			//Return comments to the queue
+			for _, c := range toNotify {
+				commentChan <- c
+			}
+		}
+	}()
 	articles := make(map[string][]comment)
-	for _, c := range comments {
+	for _, c := range toNotify {
 		if ar, found := articles[c.URL]; found {
 			ar = append(ar, c)
 		} else {
 			articles[c.URL] = []comment{c}
 		}
 	}
+	buf := &bytes.Buffer{}
+	err := emailTemplate.ExecuteTemplate(buf, "notification", articles)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 	auth := config.EmailAuth()
-	smtp.SendMail(auth.HostServer, auth.Auth, auth.FromEmail, auth.ToBeNotified, []byte("Test Email"))
+	smtp.SendMail(auth.HostServer, auth.Auth, auth.FromEmail, auth.ToBeNotified, buf.Bytes())
 }
 
 func notifyLoop() {
@@ -62,7 +77,7 @@ func notifyLoop() {
 			go sendEmail(toSend)
 			toSend = make([]comment, 0)
 			//Capture a comment for later sending.
-		case c := <-comments:
+		case c := <-commentChan:
 			toSend = append(toSend, c)
 		}
 	}

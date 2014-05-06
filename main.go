@@ -53,7 +53,7 @@ func main() {
 	http.HandleFunc("/blog", home)
 	http.HandleFunc("/blog/", getArticle)
 	http.HandleFunc("/blog/feed.xml", getFeed)
-	//http.HandleFunc("/submitComment/", postComment)
+	http.HandleFunc("/submitComment/", postComment)
 	http.HandleFunc("/api/", api)
 	http.HandleFunc("/blog/login", loginRoute)
 	http.HandleFunc("/admin/login", performLogin)

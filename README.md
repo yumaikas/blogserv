@@ -9,7 +9,7 @@ The sync with the server will come once I finish a few features:
 * Editing articles
 * Creating New articles
 * Makeing sure that IP addresses are part of the login scheme
-* ~~Email notifications~~ Basic email notifications are now 
+* ~~Email notifications~~ Basic email notifications are now ready.
 
 The code is currently in super hacky status (no make file or build script), and is specific to my website in some key places. That will be next on the list.
 

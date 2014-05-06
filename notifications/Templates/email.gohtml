@@ -11,11 +11,12 @@ Your blog has comments on the follwing articles:
 </p>
 
 <ul>
-{{range $name, $comment := .}}
+{{range $name, $comments := .}}
+{{$comment := index $comments 0}}
 <li>
-	{{/*LOCALIZE*/}}
-	<a href="https://junglecoder.com/blog/{{$name}}">{{$name}}</a>
-	There are {{len $comment}} comments on the article.
+	{{/*LOCALIZE to use hostname from a config.*/}}
+	<a href="https://junglcoder.com/blog/{{$comment.ArticleName}}">{{$comment.ArticleName}}</a>
+	There are {{len $comments}} comments on the article.
 </li>
 {{end}}
 </ul>

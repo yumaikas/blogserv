@@ -1,9 +1,11 @@
 package notifications
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"html/template"
+	"net"
 	"net/http"
 	"net/smtp"
 	"time"
@@ -13,7 +15,10 @@ import (
 	die "github.com/yumaikas/golang-die"
 )
 
-var commentChan = make(chan comment)
+var (
+	commentChan = make(chan comment)
+	flushChan   = make(chan struct{})
+)
 
 type comment struct {
 	arts.Comment
@@ -38,6 +43,7 @@ func init() {
 	//Die on a failed template parse.
 	die.OnErr(err)
 	go notifyLoop()
+	go listenForAdmin()
 }
 
 func sendEmail(toNotify []comment) {
@@ -66,6 +72,30 @@ func sendEmail(toNotify []comment) {
 	auth := config.EmailAuth()
 	smtp.SendMail(auth.HostServer, auth.Auth, auth.FromEmail, auth.ToBeNotified, buf.Bytes())
 }
+func listenForAdmin() {
+	l, err := net.Listen("tcp", "localhost:8001")
+	if err != nil {
+		panic(err.Error())
+	}
+	for {
+		c, err := l.Accept()
+		if err != nil {
+			c.Close()
+			continue
+		}
+		scn := bufio.NewScanner(c)
+		if scn.Scan() {
+			t := scn.Text()
+			switch t {
+			case "flush":
+				flushChan <- struct{}{}
+				fmt.Fprintln(c, "flush sent")
+			default:
+			}
+		}
+		c.Close()
+	}
+}
 
 func notifyLoop() {
 	toSend := make([]comment, 0)
@@ -73,6 +103,9 @@ func notifyLoop() {
 	tick := time.Tick(time.Minute * 15)
 	for {
 		select {
+		case <-flushChan:
+			go sendEmail(toSend)
+			toSend = make([]comment, 0)
 		case <-tick:
 			go sendEmail(toSend)
 			toSend = make([]comment, 0)

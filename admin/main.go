@@ -17,6 +17,7 @@ import (
 )
 
 var reset = flag.Bool("reset", false, "reset the templates and config")
+var flushComments = flag.Bool("flushComments", false, "Flush the comments from the notification queue. This makes sure that emails are sent")
 var password = flag.String("password", "", "Set the admin password for the blog on this computer")
 var set = flag.Bool("set", false, "Confirm setting of password.")
 var userID = flag.String("userID", "", "the admin for whom to set the password. (Note, don't put this version in the wild)")
@@ -26,7 +27,11 @@ func main() {
 	flag.Parse()
 	if *reset {
 		fmt.Println("Resetting")
-		sendReset()
+		sendAdminMessage("reset", "8000")
+	}
+	if *flushComments {
+		fmt.Println("Flushing comments")
+		sendAdminMessage("flush", "8001")
 	}
 	if (*password != "" || *userID != "") && !*set {
 		fmt.Println("Please use -set to confirm password change")
@@ -34,22 +39,20 @@ func main() {
 	if *set && *password != "" && *userID != "" {
 		setPassword(*password, *userID)
 	}
-	//	if *sendTestEmail {
-	testEmail()
-	//	}
 }
 
-func sendReset() {
-	c, err := net.Dial("tcp", "localhost:8000")
+func sendAdminMessage(message, port string) {
+
+	c, err := net.Dial("tcp", "localhost:"+port)
 	if err != nil {
 		//nothing else we can do
-		fmt.Println("Reset failed")
+		fmt.Println(message + " failed")
 		return
 	}
-	fmt.Fprintln(c, "reset")
+	fmt.Fprintln(c, message)
 	buf := bufio.NewScanner(c)
 	buf.Scan()
-	if err != nil || buf.Text() != "Reset sent" {
+	if err != nil || buf.Text() != message+" sent" {
 		fmt.Println("Reset failed")
 		return
 	}

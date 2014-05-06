@@ -6,10 +6,10 @@ Currently the website is running an older version sans a lot of the admin interf
 
 The sync with the server will come once I finish a few features:
 
-* Editing articles 
+* Editing articles
 * Creating New articles
 * Makeing sure that IP addresses are part of the login scheme
-* Email notifications
+* ~~Email notifications~~ Basic email notifications are now 
 
 The code is currently in super hacky status (no make file or build script), and is specific to my website in some key places. That will be next on the list.
 

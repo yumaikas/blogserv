@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/yumaikas/blogserv/notifications"
+
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tgascoigne/akismet"
 	arts "github.com/yumaikas/blogserv/blogArticles"
@@ -115,6 +117,12 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	//Add a successful comment to the notification
+	notifications.NotifyComment(arts.Comment{comment.Author, comment.Content},
+		comment.AuthorEmail,
+		articleName,
+		articleName,
+		r)
 	url := "/blog/" + articleName
 	http.Redirect(w, r, url, 303)
 }

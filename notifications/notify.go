@@ -48,7 +48,7 @@ func init() {
 
 func sendEmail(toNotify []comment) {
 	defer func() {
-		if die.Log() != nil {
+		if die.Log(recover()) != nil {
 			//Return comments to the queue
 			for _, c := range toNotify {
 				commentChan <- c
@@ -104,11 +104,15 @@ func notifyLoop() {
 	for {
 		select {
 		case <-flushChan:
-			go sendEmail(toSend)
-			toSend = make([]comment, 0)
+			if len(toSend) > 0 {
+				go sendEmail(toSend)
+				toSend = make([]comment, 0)
+			}
 		case <-tick:
-			go sendEmail(toSend)
-			toSend = make([]comment, 0)
+			if len(toSend) > 0 {
+				go sendEmail(toSend)
+				toSend = make([]comment, 0)
+			}
 			//Capture a comment for later sending.
 		case c := <-commentChan:
 			toSend = append(toSend, c)

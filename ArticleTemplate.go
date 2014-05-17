@@ -127,7 +127,7 @@ func template_load() template.Template {
 
 	//Panic on an error after logging, since templates are very important to the blog.
 	defer func() {
-		val := die.Log()
+		val := die.Log(recover())
 		if val != nil {
 			panic(val)
 		}
@@ -155,6 +155,7 @@ func template_load() template.Template {
 	loadTemplate("blogPost.gohtml")
 	loadTemplate("Login.gohtml")
 	loadTemplate("editor.gohtml")
+	loadTemplate("creator.gohtml")
 
 	return *temps
 }

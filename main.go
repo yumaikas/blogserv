@@ -43,22 +43,41 @@ func addClickOnceMimeTypes() {
 	mime.AddExtensionType(".xaml", "application/xaml+xml")
 	mime.AddExtensionType(".xbap", "application/x-ms-xbap")
 }
+func assignPaths() {
+	node := http.HandleFunc
+	secure := WebAdmin.SecurePath
+	authed := WebAdmin.AuthenticatedPath
+	//The feed can go over http
+	node("/blog/feed.xml", getFeed)
+
+	//Everything else is either https or https and authenticated as an admin
+	node("/", secure(root))
+	node("/index.html", secure(home))
+	node("/blog", secure(home))
+	node("/blog/", secure(getArticle))
+	node("/submitComment/", secure(postComment))
+	node("/api/", secure(api))
+	node("/blog/login", secure(loginRoute))
+
+	//This is secured, and fires auth checks, redirecting to longing if a failure happened
+	//node("/admin", secure(adminStart))
+
+	//The entire admin space needs to be authenticated
+	node("/admin/create/", authed(create))
+	node("/admin/home", authed(adminHome))
+	node("/admin/login", authed(performLogin))
+	node("/admin/logout", authed(performLogout))
+	node("/admin/edit/", authed(edit))
+	node("/admin/publish/", authed(publishArticle))
+	node("/admin/hideComment/", authed(hideComment))
+	node("/admin/showComment/", authed(showComment))
+	node("/admin/deleteComment/", authed(deleteComment))
+}
 func main() {
 	//Needs to be called inside main() for some reason. I suspect that it has
 	//something to do with initization order, but am not sure.
 	addClickOnceMimeTypes()
-	//Force a defualt main page
-	http.HandleFunc("/", root)
-	http.HandleFunc("/index.html", home)
-	http.HandleFunc("/blog", home)
-	http.HandleFunc("/blog/", getArticle)
-	http.HandleFunc("/blog/feed.xml", getFeed)
-	http.HandleFunc("/submitComment/", postComment)
-	http.HandleFunc("/api/", api)
-	http.HandleFunc("/blog/login", loginRoute)
-	http.HandleFunc("/admin/login", performLogin)
-	http.HandleFunc("/admin/logout", performLogout)
-	http.HandleFunc("/admin/edit/", edit)
+	assignPaths()
 
 	//For production use port 80
 	err := http.ListenAndServe(":8080", logMux)
@@ -70,24 +89,42 @@ func main() {
 }
 func root(w http.ResponseWriter, r *http.Request) {
 	if len(r.URL.Path) > 1 {
-		fileRoot.ServeHTTP(w, r)
+		//Only serve files to secure paths
+		WebAdmin.SecurePath(fileRoot.ServeHTTP)(w, r)
 		return
 	}
 	home(w, r)
 }
+
+//Reuqires auth
+func adminHome(w http.ResponseWriter, r *http.Request, userID string) {
+	b := new(bytes.Buffer)
+	ars, err := AdminArticles()
+	fmt.Println(r.Cookies())
+	fmt.Println("Admin access")
+	for idx, _ := range ars {
+		ars[idx].IsAdmin = true
+	}
+	if err != nil {
+		w.WriteHeader(500)
+		ars.render(w)
+		fmt.Fprintf(w, "%s", err.Error())
+		return
+	}
+	err = ars.render(b)
+	if err != nil {
+		fmt.Printf("An error occurred while rendering templates %s", err.Error())
+		w.WriteHeader(500)
+		b.WriteTo(w)
+		fmt.Fprintf(w, "%s", Err500.Error())
+		return
+	}
+
+	b.WriteTo(w)
+}
 func home(w http.ResponseWriter, r *http.Request) {
 	b := new(bytes.Buffer)
 	ars, err := HTMLArticles()
-	isAdmin := WebAdmin.AttemptAuth(w, r)
-
-	fmt.Println(r.Cookies())
-	fmt.Println("Admin:", isAdmin)
-	for idx, _ := range ars {
-		ars[idx].IsAdmin = isAdmin
-	}
-	for _, ar := range ars {
-		fmt.Println(ar.IsAdmin)
-	}
 	if err != nil {
 		w.WriteHeader(500)
 		ars.render(w)
@@ -107,7 +144,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func getArticle(w http.ResponseWriter, r *http.Request) {
-	isAdmin := WebAdmin.AttemptAuth(w, r)
+	_, isAdmin := WebAdmin.AttemptAuth(w, r)
 	articleTitle := r.URL.Path[len("/blog/"):]
 	if len(articleTitle) == 0 {
 		home(w, r)
@@ -132,20 +169,15 @@ func getArticle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func performLogin(w http.ResponseWriter, r *http.Request) {
-	if WebAdmin.AttemptAuth(w, r) {
-		WebAdmin.AddNameCookie(w, r)
-		http.Redirect(w, r, "/blog/", 303)
-	} else {
-		fmt.Println("failed attemped auth")
-		w.WriteHeader(http.StatusForbidden)
-	}
+//This path needs to be protected at the tree level
+func performLogin(w http.ResponseWriter, r *http.Request, userID string) {
+	WebAdmin.AddNameCookie(w, r, userID)
+	http.Redirect(w, r, "/admin/home", 303)
 }
 
-func performLogout(w http.ResponseWriter, r *http.Request) {
-	//FIXME: get rid of hard coded string here, by reading user ID from cookie.
-	WebAdmin.ClearToken("yumaikas")
-
+//Requires Auth
+func performLogout(w http.ResponseWriter, r *http.Request, userID string) {
+	WebAdmin.ClearToken(userID)
 	c, err := r.Cookie("authToken")
 	if err == nil {
 		c.MaxAge = -1
@@ -155,19 +187,24 @@ func performLogout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/blog/", 303)
 }
 
-func edit(w http.ResponseWriter, r *http.Request) {
-	//Fail fast
-	if !WebAdmin.AttemptAuth(w, r) {
-		w.WriteHeader(404)
-		w.Write([]byte(Err404.Error()))
-		return
-	}
+//Requires Auth
+func create(w http.ResponseWriter, r *http.Request, userID string) {
 	if r.Method == "GET" {
-		editSetup(w, r)
+		err := createSetup(w, r)
+		if err != nil {
+			w.WriteHeader(500)
+			fmt.Fprintln(w, "Unable to create article.")
+			fmt.Fprint(w, Err500.Error())
+		}
 		return
 	}
 	if r.Method == "POST" {
-		editSubmit(w, r)
+		err := createSubmit(w, r)
+		if err != nil {
+			w.WriteHeader(500)
+			fmt.Fprint(w, "Unable to save article")
+			fmt.Fprint(w, Err500.Error())
+		}
 		return
 	}
 	fmt.Println("Invalid method for edit URL.")
@@ -175,39 +212,124 @@ func edit(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, Err404.Error())
 }
 
-func editSubmit(w http.ResponseWriter, r *http.Request) {
-	articleTitle := r.URL.Path[len("/admin/edit/"):]
-	ar, err := fillArticle(articleTitle)
+//This function needs to be auth verified before calling.
+func createSetup(w http.ResponseWriter, r *http.Request) error {
+	data := struct {
+		IsAdmin bool
+	}{
+		//Used because admin-ness was asserted earlier
+		IsAdmin: true,
+	}
+	buf := &bytes.Buffer{}
+	err := blogTemps.ExecuteTemplate(buf, "creator", data)
 	if err != nil {
-		w.WriteHeader(500)
-		fmt.Fprintln(w, Err500.Error())
+		//Errors are written at the level above this
+		return err
+	}
+	buf.WriteTo(w)
+	return err
+}
+
+func createSubmit(w http.ResponseWriter, r *http.Request) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+
+	title := r.PostFormValue("Title")
+	article := r.PostFormValue("article")
+	url := r.PostFormValue("Slug")
+	ar := arts.Article{
+		Content:      article,
+		Title:        title,
+		URL:          url,
+		PublishStage: "Draft",
+	}
+	err = arts.SaveArticle(ar)
+	if err != nil {
+		fmt.Println("Error in saving article", err)
+	}
+	return err
+}
+
+//Requires Auth
+func edit(w http.ResponseWriter, r *http.Request, userID string) {
+	if r.Method == "GET" {
+		err := editSetup(w, r)
+		if err != nil {
+			w.WriteHeader(500)
+			fmt.Fprintln(w, "Unable to edit article.")
+			fmt.Fprint(w, Err500.Error())
+		}
 		return
 	}
+	if r.Method == "POST" {
+		err := editSubmit(w, r)
+		if err != nil {
+			w.WriteHeader(500)
+			fmt.Fprint(w, "Unable to save article edits")
+			fmt.Fprint(w, Err500.Error())
+		}
+		return
+	}
+	fmt.Println("Invalid method for edit URL.")
+	w.WriteHeader(404)
+	fmt.Fprint(w, Err404.Error())
+}
+
+func publishArticle(w http.ResponseWriter, r *http.Request, userID string) {
+	articleTitle := r.URL.Path[len("/admin/publish/"):]
+	fmt.Println("Attempting to publish article:", articleTitle)
+	err := saveArticle(w, r, articleTitle, "Published")
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Fprint(w, "Unable to publish Article")
+		fmt.Fprint(w, Err500.Error())
+	} else {
+		http.Redirect(w, r, "/blog/"+articleTitle, 303)
+	}
+
+}
+
+func editSubmit(w http.ResponseWriter, r *http.Request) error {
+	articleTitle := r.URL.Path[len("/admin/edit/"):]
+	fmt.Println("Attempting to edit article:", articleTitle)
+	err := saveArticle(w, r, articleTitle, "Draft")
+	if err == nil {
+		http.Redirect(w, r, "/admin/edit/"+articleTitle, 303)
+	}
+	return err
+}
+
+func saveArticle(w http.ResponseWriter, r *http.Request, articleTitle, publishStage string) error {
+	art, err := fillArticle(articleTitle)
 	r.ParseForm()
 
 	title := r.PostFormValue("Title")
 	article := r.PostFormValue("article")
-	art := arts.Article(ar)
-	art.Content = article
-	art.Title = title
-	art.PublishStage = "Draft"
+	ar := arts.Article(art)
+	ar.Content = article
+	ar.Title = title
+	ar.PublishStage = publishStage
+	err = arts.SaveArticle(arts.Article(ar))
+	if err != nil {
+		fmt.Println("Error in saving article", err)
+	}
+	return err
 }
 
 //This function needs to be auth verified before calling.
-func editSetup(w http.ResponseWriter, r *http.Request) {
+func editSetup(w http.ResponseWriter, r *http.Request) error {
 
+	fmt.Println(r.URL.Path)
 	articleTitle := r.URL.Path[len("/admin/edit/"):]
 	ar, err := fillArticle(articleTitle)
 
 	if err == arts.ErrArticleNotFound {
-		w.WriteHeader(404)
-		w.Write([]byte("Article not found!"))
-		return
+		fmt.Println("Unable to find article for editing")
+		return err
 	} else if err != nil {
-		w.WriteHeader(500)
-		w.Write([]byte(Err500.Error()))
-		fmt.Println(err)
-		return
+		return err
 	}
 	data := struct {
 		Content, Title, URL string
@@ -221,13 +343,12 @@ func editSetup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = blogTemps.ExecuteTemplate(w, "editor", data)
-	fmt.Println(err)
+	return err
 }
 
 func loginRoute(w http.ResponseWriter, r *http.Request) {
-
-	if WebAdmin.AttemptAuth(w, r) {
-		http.Redirect(w, r, "/blog/", 303)
+	if _, isAdmin := WebAdmin.AttemptAuth(w, r); isAdmin {
+		http.Redirect(w, r, "/admin/home", 303)
 	} else {
 		buf := new(bytes.Buffer)
 		err := blogTemps.ExecuteTemplate(buf, "Login", nil)

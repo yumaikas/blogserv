@@ -1,14 +1,14 @@
-{{define "createArticle"}}
+{{define "creator"}}
 <!DOCTYPE html>
 <html>
 	<head>
 	<meta charset="utf-8">
 
 		<link href="/css/editor.css" rel="stylesheet" type="text/css">
-		<script type="text/javascript" src="/js/epiceditor.min.js"></script>
-		 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script type="text/javascript" src="/js/vendor/epiceditor.min.js"></script>
+		 <script src="/js/jquery1_4_2.js"></script>
 		<title>
-			{{.Title}} | Jungle Coder
+			(New article) | Jungle Coder
 		</title>
 	</head>
 	<body>
@@ -19,25 +19,23 @@
 		<div id="main">
 			<div class="sidebar">
 			{{template "sidebar" .}}
-			</div>
-			<form action="/admin/edit/{{.URL}}" method="POST">
-				<label for="Title">Title: </label>
-				<input type="text" id="Title" name="Title" placeholder="Title Here" class="bigInput" value="{{.Title}}">
-				<br>
-				<label for="Slug">Slug: </label>
-				<input type="text" id="Title" name="Title" placeholder="Slug for article (must be valid in a URL)"/>
-				<br>
-				<!--This label will be in the post creator, but not the post editor-->
-				<!--<label for="URL">Slug: </label><input type="text" id="URL" name="URL" placeholder="ArticleSlug" class="bigInput" value="{{.URL}}">-->
 
+			</div>
+			<form method="POST" id="submission">
+				<label for="Slug">Slug: </label>
+				<input type="text" id="Slug" name="Slug" placeholder="Enter URL slug here" class="bigInput" value="">
+				<label for="Title">Title: </label>
+				<input type="text" id="Title" name="Title" placeholder="Title Here" class="bigInput" value="">
+				<br>
+				<button id="save" formAction="/admin/create/">Save draft</button>
 			<div id="epiceditor" class="content left"></div>
-			<textarea name="article" id="article" cols="30" rows="10" class="hidden">{{.Content}}</textarea>
+			<textarea name="article" id="article" cols="30" rows="10" class="hidden" placeholder="..."></textarea>
 			</form>
 			</div>
 	<script type="text/javascript">
 		var opts = {
 			textarea: "article",
-			basePath: "/js/epiceditor/themes",
+			basePath: "/js/vendor/epiceditor/themes",
 			theme: {
 				base: "/base/epiceditor.css",
 				editor: "/editor/epic-light.css",
@@ -48,10 +46,19 @@
 				maxHeight: 600,
 			}
 		};
+		//This is a replace regex for the form action.
+		var search = /^\/admin\/\w+\/(\w+)\/$/;
 		var editor = new EpicEditor(opts).load();
-
+		var publishReplace = function (str) {
+			var s = str.replace(search, "/admin/publish/$1"); 
+			return s;
+		}
+		var editReplace = function (str) {
+			var s = str.replace(search, "/admin/edit/$1");
+			return s;
+		}
 		$(document).ready(function($) {
-			$("input#Title").bind("keypress", function (e) {
+			$("input#Title").bind("keyup", function (e) {
 				document.title = this.value + " | Jungle Coder";
 			});	
 		});

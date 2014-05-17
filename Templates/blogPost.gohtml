@@ -36,15 +36,23 @@
 				<h3>
 					Comments
 				</h3>{{range .Comments}}
+				{{/*Never show deleted comments*/}}
+				{{if (and (not (eq .Status "Deleted")) (or (eq .Status "Shown") $isAdmin))}}
 				<h4>
 					{{.UserName}}
 					{{if $isAdmin}}
-					(Remove comment)
+					{{if eq .Status "Shown"}}
+					<a href="/admin/hideComment/{{.GUID}}">Hide</a>
+					{{else if eq .Status "Hidden"}}
+					<a href="/admin/showComment/{{.GUID}}">Show</a>
+					{{end}} | 
+					<a href="/admin/deleteComment/{{.GUID}}">Delete</a>
 					{{end}}
 				</h4>
 				<p>
-					{{.Content}}
+				{{.Content}}
 				</p>
+				{{end}}
 				{{else}} There are no comments for this article yet. 
 				{{end}}
 			</div>

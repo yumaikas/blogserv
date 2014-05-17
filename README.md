@@ -4,11 +4,13 @@ This is the software that powers https://junglecoder.com. It is currently only i
 
 Currently the website is running an older version sans a lot of the admin interface that this version is working on.
 
-The sync with the server will come once I finish a few features:
+Just added:
 
-* Editing articles
-* Creating New articles
+### Web administration features
+* Editing articles (with many thanks to epiceditor)
+* Creating New articles 
 * Makeing sure that IP addresses are part of the login scheme
+* Administering comments
 * ~~Email notifications~~ Basic email notifications are now ready.
 
 The code is currently in super hacky status (no make file or build script), and is specific to my website in some key places. That will be next on the list.
@@ -64,18 +66,14 @@ To set it up on your VPS/server you will need to at least do the following:
 
 ```Sql
 
-	CREATE TABLE Articles (URL TEXT,
-	 id INTEGER PRIMARY KEY,
-	 Content TEXT,
-	 Title TEXT,
-	  PublishStage TEXT);
-	CREATE TABLE Comments (id INTEGER PRIMARY KEY, ArticleID int, UserID int, Content string);
+	CREATE TABLE Articles (URL TEXT, id INTEGER PRIMARY KEY, Content TEXT, Title TEXT, PublishStage TEXT);
+	CREATE TABLE Comments (id INTEGER PRIMARY KEY, ArticleID int, UserID int, Content string, GUID TEXT, Status TEXT);
 	CREATE TABLE Tags (id INTEGER PRIMARY KEY, name TEXT, ArticleID NUMERIC);
 	CREATE TABLE Users (Email TEXT, id INTEGER PRIMARY KEY, screenName TEXT);
 	CREATE TABLE Visits (IPAddress TEXT, UserID NUMERIC, UserAgent TEXT);
-	CREATE TABLE authToken (token TEXT, userID TEXT);
-	CREATE TABLE credentials(password TEXT, userID TEXT, actions TEXT );
-
+	CREATE TABLE authToken (token TEXT, userID TEXT, IPAddress TEXT);
+	CREATE TABLE credentials(password TEXT, userID TEXT, actions TEXT
+	);
 ```
 
 6- Run `go build` and `go install` in `blogserv/admin`, `blogserv/postMerger`, and `blogserv`
@@ -94,3 +92,10 @@ To set it up on your VPS/server you will need to at least do the following:
 
 10-  If all that worked, the blog should be listeing on port 8080.
 
+## Exteneded setup
+
+To be able to create and edit articles as an blog adminstrator, you will need to setup a web account on the server. If the above has completed succesfully, then all that needs to be done is to use the admin command(use a space in front of the command to keep it from going to the bash history):
+
+```bash
+ admin -createUser -password=passwordhere -userid
+```

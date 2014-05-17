@@ -7,69 +7,90 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/yumaikas/golang-die"
+
 	"code.google.com/p/go.crypto/bcrypt"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/yumaikas/blogserv/config"
 )
 
-//Fixing in general: Add code to create a record for a user if said user doesn't exist
-
-//FIXME: get rid of hard coded string
 func ClearToken(userID string) {
-	setAuthToken("", "yumaikas")
+	//Blanking IP address and token
+	setAuthToken("", userID, "")
 }
 
-func authToken(userID string) (token string, retErr error) {
-	defer func() {
-		if recov(&retErr) {
-			token = ""
-		}
-	}()
-
+func idFromTokenAndIP(token, IPAddr string) (userID string, retErr error) {
 	db, err := dbOpen()
 	defer db.Close()
-	dieOnErr(err)
+	if err != nil {
+		return "", err
+	}
+	q := "Select UserID from AuthToken where Token = ? and IPAddress = ? limit 1"
+	err = db.QueryRow(q, token, IPAddr).Scan(&userID)
+	if err != nil {
+		return "", err
+	}
+	//Returning named parameters.
+	return userID, nil
+}
 
-	dieOnErr(db.QueryRow("Select token from authToken limit 1").Scan(&token))
+func tokenFromIDandIPAddr(userID, IPAddr string) (token string, retErr error) {
+	db, err := dbOpen()
+	defer db.Close()
+	//The token is never set, and so it is "" if this fails
+	die.OnErr(err)
+
+	q := "Select token from authToken where UserID = ? and IPAddress = ? limit 1"
+	if err = db.QueryRow(q, userID, IPAddr).Scan(&token); err != nil {
+		return "", err
+	}
 	//Returning named parameters.
 	return
 }
 
-func setAuthToken(token, userID string) (retErr error) {
-	defer recov(&retErr)
+func setAuthToken(token, userID, IPAddr string) (retErr error) {
+	defer func() {
+		if val := recover(); val != nil {
+			retErr = fmt.Errorf("Error in setting auth token: %v", val)
+		}
+	}()
 	db, err := dbOpen()
 	defer db.Close()
-	dieOnErr(err)
+	die.OnErr(err)
 
-	res, err := db.Exec("Update authToken set token = ? where userID = ?", token, userID)
-	dieOnErr(err)
-
-	if num, e := res.RowsAffected(); num != 1 {
-		//if an error is still here, throw that first.
-		dieOnErr(e)
+	res, err := db.Exec("Update authToken set token = ?, IPAddress = ? where userID = ?", token, IPAddr, userID)
+	die.OnErr(err)
+	if num, e := res.RowsAffected(); num > 1 || e != nil {
+		die.OnErr(e)
 		//Otherwise, complain about the wrong number of rows being updated.
-		dieOnErr(errors.New("Wrong number of rows in auth table, please check the integrity of the database"))
+		die.OnErr(errors.New(fmt.Sprint("Wrong number of rows for user", userID, ".Please check integrity of database.")))
+	} else if num == 0 {
+		//As this is an insert, the number of rows affected shouldn't matter, since it should always be one.
+		//The main cause for it not to be one would be some kind of schema error, which would be captured into err
+		_, err = db.Exec("Insert into authToken(userID, token, IPAddress) values (?,?,?) ", userID, token, IPAddr)
+		die.OnErr(err)
 	}
 	return
 }
 
-//This funciton and the one following it are a unit of work
+//This function and the one following it are a unit of work
 func checkLoginCreds(password, userName, remoteAddr string) (canLogin bool) {
 	defer func() {
-		//logErr calls recover()
-		if logErr("Error in login code") {
+		if die.Log(recover()) != nil {
 			canLogin = false
 		}
 	}()
 
 	db, err := dbOpen()
 	defer db.Close()
-	dieOnErr(err)
+	die.OnErr(err)
+
+	fmt.Println("poiu")
 
 	var dbPass string
-	query := "Select password from credentials where userID = ?"
-	fmt.Println("poiu")
-	dieOnErr(db.QueryRow(query, userName).Scan(&dbPass))
+	q := "Select password from credentials where userID = ?"
+	die.OnErr(db.QueryRow(q, userName).Scan(&dbPass))
+
 	fmt.Println("asdf")
 
 	//Cast the types as needed
@@ -83,9 +104,9 @@ func checkLoginCreds(password, userName, remoteAddr string) (canLogin bool) {
 		return false
 	} else {
 		//Code error here
-		dieOnErr(err)
+		die.OnErr(err)
 	}
-	fmt.Println("yyyyyyyyyyyyyyyyyy")
+	fmt.Println("Login Creds succeeded!")
 	return true
 }
 
@@ -94,35 +115,13 @@ func dbOpen() (*sql.DB, error) {
 	return db, err
 }
 
-func dieOnErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-func recov(err *error) bool {
-	val := recover()
+func valToErr(val interface{}) error {
 	switch val.(type) {
 	case nil:
-		return false
+		return nil
 	case error:
-		*err = val.(error)
+		return val.(error)
 	default:
-		*err = fmt.Errorf("%v", val)
+		return fmt.Errorf("%v", val)
 	}
-	return true
 }
-func logErr(preamble string) bool {
-	val := recover()
-	if val == nil {
-		return false
-	}
-	if val != nil && preamble == "" {
-		fmt.Println(val)
-	} else {
-		fmt.Println(preamble, val)
-	}
-	return true
-}
-
-//func setAuthToken(token string) (retErr error) {
-//}

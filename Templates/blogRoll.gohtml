@@ -17,6 +17,12 @@
 			<div class="sidebar"> {{template "sidebar" .}}
 				</div>
 			<div class="content left body">
+					{{/*Link to create articles in admin mode*/}}
+					{{if .IsAdmin}}
+					<h2>
+						<a class="title" href="/admin/create">Write a new article</a>
+					</h2>
+					{{end}}
 					{{/*The Model for this page is literally a list of articles. */}} 
 					{{range .}}
 					<h2>
@@ -26,7 +32,7 @@
 						{{end}}
 					</h2>
 					{{/*The content will need to be valid html, but aware that it will be in an article*/}} 
-					{{preview .Content}}<a href="/blog/{{.URL}}" >Read more...</a>
+					{{preview .HTMLContent}}<a href="/blog/{{.URL}}" >Read more...</a>
 					<hr>
 					{{end}}
 			</div>

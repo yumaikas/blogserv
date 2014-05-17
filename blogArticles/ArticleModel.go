@@ -1,4 +1,4 @@
-package blogArticles //blogservModels
+package blogArticles
 
 import (
 	"database/sql"
@@ -7,14 +7,11 @@ import (
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/russross/blackfriday"
 	"github.com/tgascoigne/akismet"
 	"github.com/yumaikas/blogserv/config"
 	die "github.com/yumaikas/golang-die"
 )
-
-type Comment struct {
-	UserName, Content string
-}
 
 type Article struct {
 	Title, URL, Content, PublishStage string
@@ -22,6 +19,11 @@ type Article struct {
 	Comments       []Comment
 	Next, Previous *Article
 	IsAdmin        bool
+}
+
+func (art *Article) HTMLContent() string {
+	output := blackfriday.MarkdownCommon([]byte(art.Content))
+	return string(output)
 }
 
 var (
@@ -56,7 +58,7 @@ func dbOpen() (*sql.DB, error) {
 func ListArticles() (arts []Article, retErr error) {
 	fmt.Print("Listing Articles\n")
 	defer func() {
-		err := die.Log()
+		err := die.Log(recover())
 		if err != nil {
 			fmt.Println("An error occured while trying to fetch articles")
 			arts = nil
@@ -87,7 +89,7 @@ func ListArticles() (arts []Article, retErr error) {
 
 func SaveArticle(ar Article) (retErr error) {
 	defer func() {
-		err := die.Log()
+		err := die.Log(recover())
 		if err != nil {
 			fmt.Println("An error occured while trying to save an article")
 			retErr = err.(error)
@@ -102,6 +104,7 @@ func SaveArticle(ar Article) (retErr error) {
 	switch checkNum {
 	case 0:
 		//create article
+		insert(ar)
 	case 1:
 		//update article
 		update(ar)
@@ -112,12 +115,12 @@ func SaveArticle(ar Article) (retErr error) {
 	return
 }
 
-func update(a Article) {
-
+func update(ar Article) {
 	db, err := dbOpen()
 	tx, err := db.Begin()
 	defer func() {
-		if val := die.Log(); val != nil {
+		if val := die.Log(recover()); val != nil {
+			fmt.Println("Article update failed!")
 			tx.Rollback()
 		}
 	}()
@@ -128,44 +131,44 @@ func update(a Article) {
 
 	res, err := tx.Exec(`
 	Update Articles
-	set Title = ?, Content = ?
+	set Title = ?, Content = ?, PublishStage = ?
 	where URL = ?
-	`, a.Title, a.Content, a.URL)
+	`, ar.Title, ar.Content, ar.PublishStage, ar.URL)
 	cnt, err1 := res.RowsAffected()
 	if cnt > 1 || err1 != nil || err != nil {
 		tx.Rollback()
-		panic(fmt.Sprintf("Update for %s Failed. %v rows would have been affected", a.URL, cnt))
+		panic(fmt.Sprintf("Update for %s Failed. %v rows would have been affected", ar.URL, cnt))
 	}
 	tx.Commit()
 }
 
-func insert(a Article) {
-
+func insert(ar Article) {
 	db, err := dbOpen()
 	tx, err := db.Begin()
 	if err != nil {
 		panic("DB open failed")
 	}
 	defer db.Close()
-	fmt.Println(a.Title)
-	fmt.Println(a.URL)
+	fmt.Println(ar.Title)
+	fmt.Println(ar.URL)
 	res, err := tx.Exec(`
 	Insert into Articles(Title, Content, URL, PublishStage) 
 	values (?, ?, ?, ?)
-	`, a.Title, a.Content, a.URL, a.PublishStage)
+	`, ar.Title, ar.Content, ar.URL, ar.PublishStage)
 	if err != nil {
 		panic(err)
 	}
 	cnt, err1 := res.RowsAffected()
 	if cnt > 1 || err1 != nil || err != nil {
 		tx.Rollback()
-		panic(fmt.Sprintf("Insert for %s Failed. %v rows would have been affected", a.URL, cnt))
+		panic(fmt.Sprintf("Insert for %s Failed. %v rows would have been affected", ar.URL, cnt))
 	}
 	tx.Commit()
 }
 
 //Populates an article based on a title.
 func FillArticle(URL string) (Article, error) {
+	fmt.Println("Url searching", URL)
 	var ar Article
 	db, err := dbOpen()
 	defer db.Close()
@@ -180,6 +183,7 @@ func FillArticle(URL string) (Article, error) {
 		where URL = ?`,
 		URL).Scan(&ar.Title, &ar.URL, &ar.Content, &articleId, &ar.PublishStage)
 	if err != nil {
+		fmt.Println("Testing for article search errors")
 		switch err {
 		case sql.ErrNoRows:
 			return ar, ErrArticleNotFound
@@ -221,7 +225,7 @@ func FillArticle(URL string) (Article, error) {
 
 	//Get the comments for the article
 	commentQ, err := db.Prepare(`
-	Select U.screenName, C.Content from 
+	Select U.screenName, C.Content, C.Status, C.Guid from 
 	Comments as C
 	inner join Users as U on C.UserID = U.id
 	where C.ArticleID = ?`)
@@ -242,7 +246,7 @@ func FillArticle(URL string) (Article, error) {
 
 	for rows.Next() {
 		var c Comment
-		err = rows.Scan(&c.UserName, &c.Content)
+		err = rows.Scan(&c.UserName, &c.Content, &c.Status, &c.GUID)
 		if err != nil {
 			//debug, for production use fmt.Printf(err)
 			log.Fatal(err)
@@ -276,66 +280,6 @@ type queryComment struct {
 
 //Currently do nothing
 func SpamToDB(c akismet.Comment, arName string) error {
-	return nil
-}
-
-func CommentToDB(c akismet.Comment, arName string) error {
-	fmt.Print("Enter CommentToDB")
-	defer fmt.Print("Exit CommentToDB")
-	db, err := dbOpen()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
-
-	tx, err := db.Begin()
-	rb := func(e error) error {
-		tx.Rollback()
-		return e
-	}
-	if err != nil {
-		return rb(err)
-	}
-
-	//This is what is going in to the db
-	in := struct {
-		UserID, ArticleID int
-		Content           string
-	}{0, 0, c.Content}
-
-	err = tx.QueryRow(`Select id from Users where Email = ?`, c.AuthorEmail).Scan(&in.UserID)
-	switch {
-	case err == sql.ErrNoRows:
-		var u_err error
-		in.UserID, u_err = addUser(c, tx)
-		if u_err != nil {
-			return rb(err)
-		}
-		break
-	case err != nil:
-		return rb(err)
-	}
-	err = tx.QueryRow(`Select id from Articles where URL = ?`, arName).Scan(&in.ArticleID)
-	if err != nil {
-		return rb(err)
-	}
-	//The results and error(if any)
-	r, err := tx.Exec(`Insert into Comments (UserID, ArticleID, Content) values (?, ?, ?)`,
-		in.UserID, in.ArticleID, in.Content)
-	if err != nil {
-		return rb(err)
-	}
-	numRows, err := r.RowsAffected()
-	switch {
-	case err != nil:
-		return rb(err)
-	case numRows != 1:
-		return rb(fmt.Errorf("Error: %d rows were affected instead of 1", numRows))
-	}
-	err = tx.Commit()
-	if err != nil {
-		return rb(err)
-	}
 	return nil
 }
 

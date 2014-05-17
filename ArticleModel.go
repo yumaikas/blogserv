@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 
+	"github.com/yumaikas/blogserv/WebAdmin"
 	"github.com/yumaikas/blogserv/notifications"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -55,6 +57,9 @@ func listArticles(filter func(arts.Article) bool) (articleList, error) {
 	}
 	return articleList(artemp), err
 }
+func AdminArticles() (articleList, error) {
+	return arts.ListArticles()
+}
 func DraftsArticles() (articleList, error) {
 	return listArticles(arts.IsDraft)
 }
@@ -87,6 +92,10 @@ func (ars articleList) IsAdmin() bool {
 func postComment(w http.ResponseWriter, r *http.Request) {
 	articleName := r.URL.Path[len("/submitComment/"):]
 
+	redirect := func() {
+		url := "/blog/" + articleName
+		http.Redirect(w, r, url, 303)
+	}
 	r.ParseForm()
 	comment := akismet.Comment{
 		UserIP:      r.RemoteAddr,
@@ -94,6 +103,15 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 		Author:      r.FormValue("author"),
 		AuthorEmail: r.FormValue("email"),
 		Content:     r.FormValue("Comment"),
+	}
+	if WebAdmin.IsLoopback(r) {
+		err := arts.CommentToDB(comment, articleName)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		redirect()
+		return
 	}
 	err := akismet.CommentCheck(akis, comment)
 	if err != nil {
@@ -118,16 +136,46 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Add a successful comment to the notification
-	notifications.NotifyComment(arts.Comment{comment.Author, comment.Content},
+	notifications.NotifyComment(arts.Comment{UserName: comment.Author, Content: comment.Content},
 		comment.AuthorEmail,
 		articleName,
 		articleName,
 		r)
-	url := "/blog/" + articleName
-	http.Redirect(w, r, url, 303)
+	redirect()
 }
 
-//Add code to check for the user, and insert the user if need be
+//Make to only redirect when the referer is from the website. I don't want a open redirect relay
+var (
+	loopbackReferer = regexp.MustCompile(`http://localhost:\d+/blog/(\w+)`)
+	//TODO: localize this to pull host value from config
+	productionReferer = regexp.MustCompile(`https://(www)?\.junglecoder\.com:(\d+)?/blog/(\w+)`)
+)
+
+var showComment = adminComment("/admin/showComment/", arts.ShowComment)
+var hideComment = adminComment("/admin/hideComment/", arts.HideComment)
+var deleteComment = adminComment("/admin/deleteComment/", arts.DeleteComment)
+
+//This is a template for comment administration
+func adminComment(path string, adminAction func(string) error) WebAdmin.AuthedFunc {
+	return func(w http.ResponseWriter, r *http.Request, userID string) {
+		guid := r.URL.Path[len(path):]
+		err := adminAction(guid)
+		if err != nil {
+			fmt.Println("In path:", path, "Error occured:", err)
+			w.WriteHeader(500)
+			fmt.Fprint(w, Err500.Error())
+			return
+		}
+		fmt.Println("Referer:", r.Referer())
+		if WebAdmin.IsLoopback(r) && loopbackReferer.MatchString(r.Referer()) {
+			http.Redirect(w, r, r.Referer(), 303)
+		} else if productionReferer.MatchString(r.Referer()) {
+			http.Redirect(w, r, r.Referer(), 303)
+		}
+		http.Redirect(w, r, "/admin/home", 303)
+	}
+}
+
 //These are the values that are populated in the comment.
 /*
 	    UserIP:      r.RemoteAddr,

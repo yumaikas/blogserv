@@ -11,9 +11,9 @@ Just added:
 * Creating New articles 
 * Makeing sure that IP addresses are part of the login scheme
 * Administering comments
-* ~~Email notifications~~ Basic email notifications are now ready.
+* Basic email notifications. 
 
-The code is currently in super hacky status (no make file or build script), and is specific to my website in some key places. That will be next on the list.
+The code is currently in super hacky status (no make file or build script), and is specific to my website in some key places. Pulling the hostname into the config file is the next item on the list. (grep for junglecoder to get an idea of which files will be affected.)
 
 Choices currently made for this engine:
 
@@ -94,7 +94,7 @@ To set it up on your VPS/server you will need to at least do the following:
 
 ## Exteneded setup
 
-To be able to create and edit articles as an blog adminstrator, you will need to setup a web account on the server. If the above has completed succesfully, then all that needs to be done is to use the admin command(use a space in front of the command to keep it from going to the bash history):
+To be able to create and edit articles as a blog adminstrator, you will need to setup a web account on the server. If the above has completed succesfully, then all that needs to be done is to use the admin command(use a space in front of the command to keep it from going to the bash history):
 
 ```bash
  admin -createUser -password=passwordhere -userid

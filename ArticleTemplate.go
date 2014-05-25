@@ -126,12 +126,8 @@ func template_init() {
 func template_load() template.Template {
 
 	//Panic on an error after logging, since templates are very important to the blog.
-	defer func() {
-		val := die.Log(recover())
-		if val != nil {
-			panic(val)
-		}
-	}()
+	var err error
+	die.LogSettingReturns("template_Load", &err, func() { die.OnErr(err) })
 	funcs := template.FuncMap{
 		"splitUpper": spaceTitleCase,
 		"preview":    Preview,

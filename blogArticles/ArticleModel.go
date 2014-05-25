@@ -56,15 +56,7 @@ func dbOpen() (*sql.DB, error) {
 }
 
 func ListArticles() (arts []Article, retErr error) {
-	fmt.Print("Listing Articles\n")
-	defer func() {
-		err := die.Log(recover())
-		if err != nil {
-			fmt.Println("An error occured while trying to fetch articles")
-			arts = nil
-			retErr = err.(error)
-		}
-	}()
+	defer die.LogSettingReturns("ListArticles", &retErr, func() { arts = nil })
 	var ars = make([]Article, 0)
 
 	db, err := dbOpen()
@@ -88,13 +80,7 @@ func ListArticles() (arts []Article, retErr error) {
 }
 
 func SaveArticle(ar Article) (retErr error) {
-	defer func() {
-		err := die.Log(recover())
-		if err != nil {
-			fmt.Println("An error occured while trying to save an article")
-			retErr = err.(error)
-		}
-	}()
+	die.LogErr("SaveArticle", &retErr)
 	db, err := dbOpen()
 	defer db.Close()
 	die.OnErr(err)
@@ -116,14 +102,15 @@ func SaveArticle(ar Article) (retErr error) {
 }
 
 func update(ar Article) {
+	var err error
 	db, err := dbOpen()
 	tx, err := db.Begin()
-	defer func() {
-		if val := die.Log(recover()); val != nil {
-			fmt.Println("Article update failed!")
+	//There is no error to return.
+	defer die.LogSettingReturns("SaveArticle/update", &err,
+		func() {
 			tx.Rollback()
-		}
-	}()
+			die.OnErr(err)
+		})
 	defer db.Close()
 
 	fmt.Println("Attempting DB Open")
@@ -136,8 +123,7 @@ func update(ar Article) {
 	`, ar.Title, ar.Content, ar.PublishStage, ar.URL)
 	cnt, err1 := res.RowsAffected()
 	if cnt > 1 || err1 != nil || err != nil {
-		tx.Rollback()
-		panic(fmt.Sprintf("Update for %s Failed. %v rows would have been affected", ar.URL, cnt))
+		die.OnErr(fmt.Errorf("Update for %s Failed. %v rows would have been affected", ar.URL, cnt))
 	}
 	tx.Commit()
 }
@@ -145,23 +131,23 @@ func update(ar Article) {
 func insert(ar Article) {
 	db, err := dbOpen()
 	tx, err := db.Begin()
-	if err != nil {
-		panic("DB open failed")
-	}
+	defer die.LogSettingReturns("SaveArticle/insert", &err,
+		func() {
+			tx.Rollback()
+			die.OnErr(err)
+		})
 	defer db.Close()
+	die.OnErr(err)
 	fmt.Println(ar.Title)
 	fmt.Println(ar.URL)
 	res, err := tx.Exec(`
 	Insert into Articles(Title, Content, URL, PublishStage) 
 	values (?, ?, ?, ?)
 	`, ar.Title, ar.Content, ar.URL, ar.PublishStage)
-	if err != nil {
-		panic(err)
-	}
+	die.OnErr(err)
 	cnt, err1 := res.RowsAffected()
 	if cnt > 1 || err1 != nil || err != nil {
-		tx.Rollback()
-		panic(fmt.Sprintf("Insert for %s Failed. %v rows would have been affected", ar.URL, cnt))
+		die.OnErr(fmt.Errorf("Insert for %s Failed. %v rows would have been affected", ar.URL, cnt))
 	}
 	tx.Commit()
 }

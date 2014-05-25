@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/gorilla/feeds"
 	"io"
+
+	"github.com/gorilla/feeds"
 )
 
 var feed = &feeds.Feed{
@@ -21,11 +22,10 @@ func renderFeed(w io.Writer) error {
 	}
 	items := make([]*feeds.Item, 0)
 	for _, ar := range ars {
-
 		i := &feeds.Item{
 			Title:       ar.Title,
 			Link:        Article(ar).RSSLink(),
-			Description: ar.Content,
+			Description: ar.HTMLContent(),
 		}
 		items = append(items, i)
 	}

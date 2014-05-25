@@ -78,7 +78,7 @@ func sendAdminMessage(message, port string) {
 	fmt.Println("Server told to " + message)
 }
 func createUserOnDB(password, userID string) {
-	defer func() { die.Log(recover()) }()
+	defer die.Log("createUserOnDB")
 
 	passBuf := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(passBuf, 13)
@@ -94,8 +94,7 @@ func createUserOnDB(password, userID string) {
 }
 
 func setPassword(password, userID string) {
-	defer func() { die.Log(recover()) }()
-
+	die.Log("setPassword")
 	passBuf := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(passBuf, 13)
 	die.OnErr(err)
@@ -107,25 +106,6 @@ func setPassword(password, userID string) {
 	die.OnErr(err)
 
 	fmt.Println("Password successfully updated.")
-}
-
-func dieOnErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
-func logErr() interface{} {
-	val := recover()
-	if val != nil {
-		fmt.Println(val)
-		return val
-	}
-	return nil
-}
-
-func recovErr(err *error) {
-	*err = recover().(error)
 }
 
 func testEmail() {
@@ -152,7 +132,11 @@ Subject: Test Email
 }
 
 func fillGUIDComments() {
+	defer die.Log("filGUIDComments")
 	db, err := sql.Open("sqlite3", config.DbPath())
+	die.OnErr(err)
+	u := `Update Comments set GUID = 'NIL' where GUID is NULL`
+	_, err = db.Exec(u)
 	die.OnErr(err)
 	idsToFill := make([]int, 0)
 	q := `Select GUID, id from Comments`

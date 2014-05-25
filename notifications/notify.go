@@ -47,14 +47,13 @@ func init() {
 }
 
 func sendEmail(toNotify []comment) {
-	defer func() {
-		if die.Log(recover()) != nil {
+	defer die.LogSettingReturns("sendEmail", nil,
+		func() {
 			//Return comments to the queue
 			for _, c := range toNotify {
 				commentChan <- c
 			}
-		}
-	}()
+		})
 	articles := make(map[string][]comment)
 	for _, c := range toNotify {
 		if ar, found := articles[c.URL]; found {

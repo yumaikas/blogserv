@@ -73,13 +73,9 @@ func setAuthToken(token, userID, IPAddr string) (retErr error) {
 	return
 }
 
-//This function and the one following it are a unit of work
 func checkLoginCreds(password, userName, remoteAddr string) (canLogin bool) {
-	defer func() {
-		if die.Log(recover()) != nil {
-			canLogin = false
-		}
-	}()
+	var err error
+	defer die.LogSettingReturns("checkLoginCreds", &err, func() { canLogin = false })
 
 	db, err := dbOpen()
 	defer db.Close()

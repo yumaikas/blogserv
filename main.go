@@ -48,7 +48,7 @@ func assignPaths() {
 	secure := WebAdmin.SecurePath
 	authed := WebAdmin.AuthenticatedPath
 	//The feed can go over http
-	node("/blog/feed.xml", getFeed)
+	http.HandleFunc("/blog/feed.xml", getFeed)
 
 	//Everything else is either https or https and authenticated as an admin
 	node("/", secure(root))

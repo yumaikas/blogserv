@@ -1,3 +1,5 @@
+// TODO: Create a 500 panic handler here, so as to consolidate code.
+// To do this, stub out
 package main
 
 import (
@@ -6,7 +8,7 @@ import (
 	"time"
 )
 
-//Here you can write your logging code
+// Here you can write your logging code
 func Log(handler http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {

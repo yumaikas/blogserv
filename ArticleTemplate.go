@@ -152,6 +152,7 @@ func template_load() template.Template {
 	loadTemplate("Login.gohtml")
 	loadTemplate("editor.gohtml")
 	loadTemplate("creator.gohtml")
+	loadTemplate("serverError.gohtml")
 
 	return *temps
 }

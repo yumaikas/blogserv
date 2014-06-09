@@ -25,7 +25,8 @@ var createUser = flag.Bool("createUser", false, "Create a new user with a passwo
 var set = flag.Bool("set", false, "Confirm setting of password.")
 var userID = flag.String("userID", "", "the admin for whom to set the password. (Note, don't put this version in the wild)")
 var sendTestEmail = flag.Bool("testEmail", false, "Send a test email to make sure that email is working.")
-var FillGUIDS = flag.Bool("fillGUIDs", false, "Fill the GUIDS for the comments on the database")
+var fillGUIDS = flag.Bool("fillGUIDs", false, "Fill the GUIDS for the comments on the database")
+var dumpConfig = flag.Bool("dumpConfig", false, "Show the location of the DB file")
 
 func main() {
 	flag.Parse()
@@ -53,13 +54,20 @@ func main() {
 		setPassword(*password, *userID)
 		return
 	}
-	if *FillGUIDS {
+	if *fillGUIDS {
 		fillGUIDComments()
+		return
+	}
+	if *dumpConfig {
+		showConfigValues()
 		return
 	}
 	flag.Usage()
 }
 
+func showConfigValues() {
+	fmt.Print(config.DbPath())
+}
 func sendAdminMessage(message, port string) {
 
 	c, err := net.Dial("tcp", "localhost:"+port)
@@ -94,7 +102,7 @@ func createUserOnDB(password, userID string) {
 }
 
 func setPassword(password, userID string) {
-	die.Log("setPassword")
+	defer die.Log("setPassword")
 	passBuf := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(passBuf, 13)
 	die.OnErr(err)

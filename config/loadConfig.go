@@ -114,10 +114,16 @@ func ReloadConfig() {
 	m.Unlock()
 }
 
+const localPath = `config.json`
+
+// Look in the current folder for a config file, and then in location specified by teh environment variable
 func defaultConfig() (*blogservConfig, error) {
 	//Return default config based on settings
 	var p string
-	if p = os.Getenv("BLOGSERV_CONFIG"); p == "" {
+	os.Stat(localPath)
+	if info, err := os.Stat(localPath); err == nil && info.Mode().IsRegular() {
+		p = localPath
+	} else if p = os.Getenv("BLOGSERV_CONFIG"); p == "" {
 		return nil, ErrInvalidEnvPath
 	}
 	var f *os.File

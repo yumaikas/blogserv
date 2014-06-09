@@ -116,7 +116,7 @@ func ReloadConfig() {
 
 const localPath = `config.json`
 
-// Look in the current folder for a config file, and then in location specified by teh environment variable
+// Look in the current folder for a config file, and then in location specified by the environment variable
 func defaultConfig() (*blogservConfig, error) {
 	//Return default config based on settings
 	var p string

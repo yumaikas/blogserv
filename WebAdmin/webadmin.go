@@ -9,7 +9,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"yumaikas/die"
+
+	"github.com/yumaikas/golang-die"
 )
 
 func err404ToWriter(w http.ResponseWriter) {

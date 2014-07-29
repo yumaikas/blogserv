@@ -130,20 +130,7 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 			return "", false
 		}
 		fmt.Println(c)
-		//Check the security
-		canLogin := IsLoopback(r) || (c.HttpOnly == true && c.Secure)
-		fmt.Println("Can login: ", canLogin)
-		fmt.Println("Expires:", c.Expires)
-		if canLogin {
-			fmt.Println("Need to set SecureOnly when running produciton")
-			return userID, true
-		} else {
-			fmt.Println("Unable to login.")
-			fmt.Println("Value:", c.Value)
-			fmt.Println("Expires:", c.Expires)
-			fmt.Println("HttpOnly:", c.HttpOnly)
-			fmt.Println("Secure:", c.Secure)
-		}
+		return userID, true
 	}
 	fmt.Println("Error in logging in:", err)
 	return "", false
@@ -172,7 +159,7 @@ func setAuthCookie(w http.ResponseWriter, r *http.Request, token string) {
 	domain := "localhost"
 	if !IsLoopback(r) {
 		//TODO pull from config
-		domain = "junglecoder.com"
+		domain = ".junglecoder.com"
 	}
 	cookie := &http.Cookie{
 		//When testing on localhost
@@ -180,7 +167,7 @@ func setAuthCookie(w http.ResponseWriter, r *http.Request, token string) {
 		Value:    token,
 		HttpOnly: true,
 		Expires:  time.Now().AddDate(0, 0, 12),
-		//Security of the cookie depends on wh
+		//Security of the cookie depends on who
 		Secure: !IsLoopback(r),
 		Path:   "/",
 		Name:   "authToken",

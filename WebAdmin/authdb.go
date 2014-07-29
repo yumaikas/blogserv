@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/yumaikas/golang-die"
 
@@ -19,16 +20,24 @@ func ClearToken(userID string) {
 	setAuthToken("", userID, "")
 }
 
+var tokenExpired = errors.New("Token expired")
+
 func idFromTokenAndIP(token, IPAddr string) (userID string, retErr error) {
 	db, err := dbOpen()
 	defer db.Close()
 	if err != nil {
 		return "", err
 	}
-	q := "Select UserID from AuthToken where Token = ? and IPAddress = ? limit 1"
-	err = db.QueryRow(q, token, IPAddr).Scan(&userID)
-	if err != nil {
+	var expiration string
+	q := "Select UserID, Expiration from AuthToken where Token = ? and IPAddress = ? limit 1"
+	die.OnErr(db.QueryRow(q, token, IPAddr).Scan(&userID, &expiration))
+	t, terr := time.Parse(time.RFC3339, expiration)
+	if terr != nil {
+		return "", terr
+	} else if err != nil {
 		return "", err
+	} else if t.Before(time.Now()) {
+		return "", tokenExpired
 	}
 	//Returning named parameters.
 	return userID, nil
@@ -40,26 +49,32 @@ func tokenFromIDandIPAddr(userID, IPAddr string) (token string, retErr error) {
 	//The token is never set, and so it is "" if this fails
 	die.OnErr(err)
 
-	q := "Select token from authToken where UserID = ? and IPAddress = ? limit 1"
-	if err = db.QueryRow(q, userID, IPAddr).Scan(&token); err != nil {
+	var expiration string
+	q := "Select token, Expiration from authToken where UserID = ? and IPAddress = ? limit 1"
+	die.OnErr(db.QueryRow(q, userID, IPAddr).Scan(&token, &expiration))
+	t, terr := time.Parse(time.RFC3339, expiration)
+	if terr != nil {
 		return "", err
+	} else if err != nil {
+		return "", terr
+	} else if t.Before(time.Now()) {
+		return "", tokenExpired
 	}
 	//Returning named parameters.
 	return
 }
 
 func setAuthToken(token, userID, IPAddr string) (retErr error) {
-	defer func() {
-		if val := recover(); val != nil {
-			retErr = fmt.Errorf("Error in setting auth token: %v", val)
-		}
-	}()
 	db, err := dbOpen()
 	defer db.Close()
 	die.OnErr(err)
-
-	res, err := db.Exec("Update authToken set token = ?, IPAddress = ? where userID = ?", token, IPAddr, userID)
-	die.OnErr(err)
+	expiration, err := time.Now().Add(2 * time.Hour).MarshalText()
+	res, err := db.Exec("Update authToken set token = ?, IPAddress = ?, Expiration = ? where userID = ?",
+		token, IPAddr, string(expiration),
+		userID)
+	if err != nil {
+		return err
+	}
 	if num, e := res.RowsAffected(); num > 1 || e != nil {
 		die.OnErr(e)
 		//Otherwise, complain about the wrong number of rows being updated.
@@ -75,7 +90,7 @@ func setAuthToken(token, userID, IPAddr string) (retErr error) {
 
 func checkLoginCreds(password, userName, remoteAddr string) (canLogin bool) {
 	var err error
-	defer die.LogSettingReturns("checkLoginCreds", &err, func() { canLogin = false })
+	canLogin = false
 
 	db, err := dbOpen()
 	defer db.Close()
@@ -109,15 +124,4 @@ func checkLoginCreds(password, userName, remoteAddr string) (canLogin bool) {
 func dbOpen() (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", config.DbPath())
 	return db, err
-}
-
-func valToErr(val interface{}) error {
-	switch val.(type) {
-	case nil:
-		return nil
-	case error:
-		return val.(error)
-	default:
-		return fmt.Errorf("%v", val)
-	}
 }

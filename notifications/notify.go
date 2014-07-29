@@ -47,13 +47,12 @@ func init() {
 }
 
 func sendEmail(toNotify []comment) {
-	defer die.LogSettingReturns("sendEmail", nil,
-		func() {
-			//Return comments to the queue
-			for _, c := range toNotify {
-				commentChan <- c
-			}
-		})
+	defer func() {
+		//Return comments to the queue
+		for _, c := range toNotify {
+			commentChan <- c
+		}
+	}()
 	articles := make(map[string][]comment)
 	for _, c := range toNotify {
 		if ar, found := articles[c.URL]; found {
@@ -69,7 +68,9 @@ func sendEmail(toNotify []comment) {
 		return
 	}
 	auth := config.EmailAuth()
-	smtp.SendMail(auth.HostServer, auth.Auth, auth.FromEmail, auth.ToBeNotified, buf.Bytes())
+	die.OnErr(smtp.SendMail(auth.HostServer, auth.Auth, auth.FromEmail, auth.ToBeNotified, buf.Bytes()))
+	// keep the notifications from going back on the queue
+	toNotify = nil
 }
 func listenForAdmin() {
 	l, err := net.Listen("tcp", "localhost:8001")

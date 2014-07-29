@@ -56,7 +56,6 @@ func dbOpen() (*sql.DB, error) {
 }
 
 func ListArticles() (arts []Article, retErr error) {
-	defer die.LogSettingReturns("ListArticles", &retErr, func() { arts = nil })
 	var ars = make([]Article, 0)
 
 	db, err := dbOpen()
@@ -80,7 +79,6 @@ func ListArticles() (arts []Article, retErr error) {
 }
 
 func SaveArticle(ar Article) (retErr error) {
-	die.LogErr("SaveArticle", &retErr)
 	db, err := dbOpen()
 	defer db.Close()
 	die.OnErr(err)
@@ -105,12 +103,9 @@ func update(ar Article) {
 	var err error
 	db, err := dbOpen()
 	tx, err := db.Begin()
-	//There is no error to return.
-	defer die.LogSettingReturns("SaveArticle/update", &err,
-		func() {
-			tx.Rollback()
-			die.OnErr(err)
-		})
+
+	// tx.Rollback is a no-op if tx.Commit has been called, which only happens in the successful case.
+	defer tx.Rollback()
 	defer db.Close()
 
 	fmt.Println("Attempting DB Open")
@@ -131,15 +126,14 @@ func update(ar Article) {
 func insert(ar Article) {
 	db, err := dbOpen()
 	tx, err := db.Begin()
-	defer die.LogSettingReturns("SaveArticle/insert", &err,
-		func() {
-			tx.Rollback()
-			die.OnErr(err)
-		})
+	defer tx.Rollback()
 	defer db.Close()
 	die.OnErr(err)
+
+	// Logging
 	fmt.Println(ar.Title)
 	fmt.Println(ar.URL)
+
 	res, err := tx.Exec(`
 	Insert into Articles(Title, Content, URL, PublishStage) 
 	values (?, ?, ?, ?)

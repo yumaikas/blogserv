@@ -23,7 +23,7 @@ type Page struct {
 }
 
 func init() {
-	//pIf any of these functions fail, we aren't ready for the server to run.
+	//If any of these functions fail, we aren't ready for the server to run.
 	//They all call log.Fatal(), so the user will get a warning when they run.
 	//akismet_init()
 
@@ -51,7 +51,7 @@ func assignPaths() {
 	http.HandleFunc("/blog/feed.xml", getFeed)
 
 	//Everything else is either https or https and authenticated as an admin
-	node("/", secure(root))
+	node("/", root)
 	node("/index.html", secure(home))
 	node("/blog", secure(home))
 	node("/blog/", secure(getArticle))
@@ -80,13 +80,14 @@ func main() {
 	assignPaths()
 
 	//For production use port 80
-	err := http.ListenAndServe(":8080", logMux)
+	err := http.ListenAndServe(":6060", logMux)
 	//For testing use port 8080
 	//err := http.ListenAndServe(":8080", logMux)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 }
+
 func root(w http.ResponseWriter, r *http.Request) {
 	if len(r.URL.Path) > 1 {
 		//Only serve files to secure paths
@@ -96,7 +97,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	home(w, r)
 }
 
-//Reuqires auth
+//Requires auth
 func adminHome(w http.ResponseWriter, r *http.Request, userID string) {
 	b := new(bytes.Buffer)
 	ars, err := AdminArticles()

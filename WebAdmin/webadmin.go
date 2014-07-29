@@ -9,8 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	die "github.com/yumaikas/golang-die"
+	"yumaikas/die"
 )
 
 func err404ToWriter(w http.ResponseWriter) {
@@ -130,8 +129,8 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 			return "", false
 		}
 		fmt.Println(c)
-		//Check the security and expiraion
-		canLogin := IsLoopback(r) || (c.Expires.After(time.Now()) && (c.HttpOnly == true && c.Secure))
+		//Check the security
+		canLogin := IsLoopback(r) || (c.HttpOnly == true && c.Secure)
 		fmt.Println("Can login: ", canLogin)
 		fmt.Println("Expires:", c.Expires)
 		if canLogin {

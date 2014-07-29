@@ -125,16 +125,13 @@ func template_init() {
 //TODO: generalize this so that it uses a config file to get the list of templates used, or just walks a directory.
 func template_load() template.Template {
 
-	//Panic on an error after logging, since templates are very important to the blog.
-	var err error
-	die.LogSettingReturns("template_Load", &err, func() { die.OnErr(err) })
 	funcs := template.FuncMap{
 		"splitUpper": spaceTitleCase,
 		"preview":    Preview,
 	}
 	temps, err := template.New("sidebar").Funcs(funcs).Parse("")
 	die.OnErr(err)
-	//This function will make a fatal log if it fails, exiting the process
+	// This function will make a fatal log if it fails, exiting the process
 	loadTemplate := func(file string) {
 		//template path has a trailing slash so that file name
 		//doesn't need to have leading one

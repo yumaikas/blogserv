@@ -79,10 +79,9 @@ func main() {
 	addClickOnceMimeTypes()
 	assignPaths()
 
-	//For production use port 80
-	err := http.ListenAndServe(":6060", logMux)
-	//For testing use port 8080
-	//err := http.ListenAndServe(":8080", logMux)
+        cert := "/home/yumaikas/ssl/jungleCoderCert.pem"
+        key := "/home/yumaikas/ssl/jungleCoderKey.pem"
+        err := http.ListenAndServeTLS(":443", cert, key, logMux)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

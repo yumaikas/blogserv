@@ -81,7 +81,7 @@ var reset chan int
 
 func listenForAdmin() {
 	reset = make(chan int)
-	l, err := net.Listen("tcp", "localhost:8000")
+	l, err := net.Listen("tcp", "localhost:6000")
 	if err != nil {
 		panic(err.Error())
 	}

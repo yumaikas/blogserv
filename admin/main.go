@@ -32,12 +32,12 @@ func main() {
 	flag.Parse()
 	if *reset {
 		fmt.Println("Resetting templates")
-		sendAdminMessage("reset", "8000")
+		sendAdminMessage("reset", "6000")
 		return
 	}
 	if *flushComments {
 		fmt.Println("Flushing comments")
-		sendAdminMessage("flush", "8001")
+		sendAdminMessage("flush", "6001")
 		return
 	}
 

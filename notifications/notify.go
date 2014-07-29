@@ -73,7 +73,7 @@ func sendEmail(toNotify []comment) {
 	toNotify = nil
 }
 func listenForAdmin() {
-	l, err := net.Listen("tcp", "localhost:8001")
+	l, err := net.Listen("tcp", "localhost:6001")
 	if err != nil {
 		panic(err.Error())
 	}

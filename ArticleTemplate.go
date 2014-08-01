@@ -128,6 +128,7 @@ func template_load() template.Template {
 	funcs := template.FuncMap{
 		"splitUpper": spaceTitleCase,
 		"preview":    Preview,
+		"isDraft": arts.isDraft,
 	}
 	temps, err := template.New("sidebar").Funcs(funcs).Parse("")
 	die.OnErr(err)

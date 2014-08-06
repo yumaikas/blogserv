@@ -44,7 +44,7 @@ func akismet_init() {
 }
 
 func RSSArticles() (rssfeed, error) {
-	ars, err := arts.ListArticles()
+	ars, err := listArticles(arts.IsPublished)
 	return rssfeed(ars), err
 }
 func listArticles(filter func(arts.Article) bool) (articleList, error) {

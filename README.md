@@ -2,8 +2,6 @@
 
 This is the software that powers https://junglecoder.com. It is currently only intended for personal use by those who are interested in go. It runs on both windows and linux with only changing an environment variable for configurations. 
 
-Currently the website is running an older version sans a lot of the admin interface that this version is working on.
-
 Just added:
 
 ### Web administration features
@@ -90,7 +88,7 @@ To set it up on your VPS/server you will need to at least do the following:
 
 9- Run `nohup blogserv &> log` to test the server on linux, or just run `blogserv.exe` if on Windows. 
 
-10-  If all that worked, the blog should be listeing on port 8080.
+10-  If all that worked, the blog should be listeing on port 6060.
 
 ## Exteneded setup
 

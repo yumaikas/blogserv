@@ -44,6 +44,7 @@ func (ar *Article) RssHTML() template.HTML {
 func (ar *Article) HTMLContent() template.HTML {
 	ar.Content = string(md.MarkdownCommon([]byte(ar.Content)))
 	ar.Content = strings.Replace(ar.Content, `<code class="`, `<code class="prettyprint lang-`, -1)
+	ar.Content = strings.Replace(ar.Content, `<code>`, `<code class="prettyprint">`, -1)
 	return template.HTML(ar.Content)
 }
 

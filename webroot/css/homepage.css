@@ -86,10 +86,10 @@ blockquote {
 code {
 	font-family: Consolas, monospace;
 	font-size: 11pt;
-	background-color: #DDDDDD;
+	background-color: #F9F9F9;
 }
 pre {
-	background-color: #DDDDDD;
+	background-color: #F9F9F9;
 	overflow: auto; 
 }
 body {

@@ -173,11 +173,12 @@ func FillArticle(URL string) (Article, error) {
 			return ar, err
 		}
 	}
-	getRow := func(id int) *sql.Row {
-		return db.QueryRow(`Select Title, URL from Articles where id = ? `, id)
+	loadRow := func(ar *Article, id int) error {
+		return db.QueryRow(`Select Title, URL, PublishStage from Articles where id = ? `, id).
+			Scan(&ar.Title, &ar.URL, &ar.PublishStage)
 	}
 	var n Article
-	err = getRow(articleId+1).Scan(&n.Title, &n.URL)
+	err = loadRow(&n, articleId+1)
 	switch err {
 	case nil:
 		_ = ""
@@ -189,7 +190,7 @@ func FillArticle(URL string) (Article, error) {
 
 	fmt.Println(n, "HEX")
 	var p Article
-	err = getRow(articleId-1).Scan(&p.Title, &p.URL)
+	err = loadRow(&p, articleId-1)
 	fmt.Println(err)
 	switch err {
 	case nil:

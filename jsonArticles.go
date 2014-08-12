@@ -36,8 +36,7 @@ func api(w http.ResponseWriter, r *http.Request) {
 }
 
 func jsonArticles() ([]jsonArticle, error) {
-
-	dbArs, err := arts.ListArticles()
+	dbArs, err := listArticles(arts.IsPublished)
 	if err != nil {
 		fmt.Println("Error loading json articles: " + err.Error())
 		return nil, Err500

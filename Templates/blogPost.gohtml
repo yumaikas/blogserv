@@ -25,10 +25,10 @@
 				</h2>
 				{{/*The content will need to be valid html, but aware that it will be in an article*/}} 
 				{{.HTMLContent}}
-				{{if .Previous.URL}}
+				{{if (and .Previous.URL (not (isDraft .Previous))) }}
 					<div>Previously: <a href="/blog/{{.Previous.URL}}">{{.Previous.Title}}</a></div>
 				{{end}}
-				{{if .Next.URL}}
+				{{if (and .Next.URL (not (isDraft .Next)))}}
 					<div>Next: <a href="/blog/{{.Next.URL}}">{{.Next.Title}}</a></div>
 				{{end}}
 			</div>

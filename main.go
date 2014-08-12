@@ -154,12 +154,17 @@ func getArticle(w http.ResponseWriter, r *http.Request) {
 	ar.IsAdmin = isAdmin
 	fmt.Println(isAdmin)
 	if err != nil {
-		fmt.Fprintln(w, "An error occurred while attempting to fetch the article")
+		Render404(w)
 		return
 	}
 
-	if ar.PublishStage != "Published" && isAdmin {
-		http.Redirect(w, r, "/admin/edit/"+articleTitle, 303)
+	if ar.PublishStage != "Published" {
+		if isAdmin {
+			http.Redirect(w, r, "/admin/edit/"+articleTitle, 303)
+		} else {
+			// This can throw a panic, but shouldn't in most cases
+			Render404(w)
+		}
 		return
 	}
 	err = ar.render(w)
@@ -169,7 +174,7 @@ func getArticle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//This path needs to be protected at the tree level
+// This path needs to be protected at the tree level
 func performLogin(w http.ResponseWriter, r *http.Request, userID string) {
 	WebAdmin.AddNameCookie(w, r, userID)
 	http.Redirect(w, r, "/admin/home", 303)

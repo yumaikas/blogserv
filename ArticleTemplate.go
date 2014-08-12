@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"strings"
 	"time"
 
@@ -31,7 +32,25 @@ func Preview(s string) template.HTML {
 		preview += tx + "\n"
 	}
 	preview += " "
-	return template.HTML(preview)
+	return template.HTML(addPrettyPrint(preview))
+}
+
+func addPrettyPrint(content string) string {
+	content = strings.Replace(content, `<code class="`, `<code class="prettyprint lang-`, -1)
+	content = strings.Replace(content, `<code>`, `<code class="prettyprint">`, -1)
+	return content
+}
+
+func (ar *Article) IsDraft() bool {
+	var art arts.Article
+	art.PublishStage = ar.PublishStage
+	return arts.IsDraft(art)
+}
+
+func (ar *Article) IsPublished() bool {
+	var art arts.Article
+	art.PublishStage = ar.PublishStage
+	return arts.IsPublished(art)
 }
 
 //Html escape the content of the article so that RSS readers can parse it.
@@ -43,9 +62,7 @@ func (ar *Article) RssHTML() template.HTML {
 //This content needs to be trusted
 func (ar *Article) HTMLContent() template.HTML {
 	ar.Content = string(md.MarkdownCommon([]byte(ar.Content)))
-	ar.Content = strings.Replace(ar.Content, `<code class="`, `<code class="prettyprint lang-`, -1)
-	ar.Content = strings.Replace(ar.Content, `<code>`, `<code class="prettyprint">`, -1)
-	return template.HTML(ar.Content)
+	return template.HTML(addPrettyPrint(ar.Content))
 }
 
 type articleList []arts.Article
@@ -60,6 +77,11 @@ var (
 func (ar *Article) render(out io.Writer) (err error) {
 	err = blogTemps.ExecuteTemplate(out, "blogPost", ar)
 	return
+}
+
+func Render404(out http.ResponseWriter) {
+	out.WriteHeader(404)
+	die.OnErr(blogTemps.ExecuteTemplate(out, "notFound", nil))
 }
 
 func (ars articleList) render(out io.Writer) (err error) {
@@ -153,6 +175,7 @@ func template_load() template.Template {
 	loadTemplate("editor.gohtml")
 	loadTemplate("creator.gohtml")
 	loadTemplate("serverError.gohtml")
+	loadTemplate("notFound.gohtml")
 
 	return *temps
 }

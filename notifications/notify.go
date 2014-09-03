@@ -39,7 +39,8 @@ var emailTemplate *template.Template
 
 func init() {
 	var err error
-	emailTemplate, err = template.ParseFiles("Templates/email.gohtml")
+	path := config.TemplatePath() + "/email.gohtml"
+	emailTemplate, err = template.ParseFiles(path)
 	//Die on a failed template parse.
 	die.OnErr(err)
 	go notifyLoop()

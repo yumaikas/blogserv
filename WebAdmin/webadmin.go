@@ -88,17 +88,6 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 		return "", false
 	}
 
-	defer func() {
-		val := recover()
-		if val != nil {
-			fmt.Println("Error in AuthAttempt", val)
-			fmt.Println(val)
-			userID = ""
-			validAuth = false
-			sleepForBadRequest()
-		}
-	}()
-
 	pass, name := r.FormValue("password"), r.FormValue("userName")
 	//If either value is empty
 	fmt.Println(pass, name)

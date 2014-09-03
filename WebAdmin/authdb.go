@@ -30,7 +30,11 @@ func idFromTokenAndIP(token, IPAddr string) (userID string, retErr error) {
 	}
 	var expiration string
 	q := "Select UserID, Expiration from AuthToken where Token = ? and IPAddress = ? limit 1"
-	die.OnErr(db.QueryRow(q, token, IPAddr).Scan(&userID, &expiration))
+	if err = db.QueryRow(q, token, IPAddr).Scan(&userID, &expiration); err == sql.ErrNoRows {
+		return "", tokenExpired
+	} else {
+		panic(err)
+	}
 	t, terr := time.Parse(time.RFC3339, expiration)
 	if terr != nil {
 		return "", terr

@@ -108,7 +108,10 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 
 	//Attempting cookie based authentication. Need to put a sleep of some sort in here...
 	c, err := r.Cookie("authToken")
-	fmt.Println("Cookie:", c.Raw, "Error (if any)", err)
+	if c != nil {
+		fmt.Print("Cookie:", c.Raw, "")
+	}
+	fmt.Println("Error (if any)", err)
 	if err == nil && c.Value != "" {
 		//Get the authToken from the database
 		fmt.Println(";lab")

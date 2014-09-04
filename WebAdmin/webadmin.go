@@ -90,7 +90,6 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 
 	pass, name := r.FormValue("password"), r.FormValue("userName")
 	//If either value is empty
-	fmt.Println(pass, name)
 	if !(pass == "" || name == "") {
 		if !checkLoginCreds(pass, name, r.RemoteAddr) {
 			fmt.Println("Sleeping to rate limit bad requests, and to keep from DOS attacks")

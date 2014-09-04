@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/smtp"
+	"runtime/debug"
 	"time"
 
 	arts "github.com/yumaikas/blogserv/blogArticles"
@@ -49,6 +50,11 @@ func init() {
 
 func sendEmail(toNotify []comment) {
 	defer func() {
+		val := recover()
+		if val != nil {
+			fmt.Println("Error while sending eamil", val)
+			debug.PrintStack()
+		}
 		//Return comments to the queue
 		for _, c := range toNotify {
 			commentChan <- c

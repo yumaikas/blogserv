@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"mime"
 	"net/http"
+	"strings"
 
 	"github.com/yumaikas/blogserv/WebAdmin"
 	arts "github.com/yumaikas/blogserv/blogArticles"
@@ -88,6 +89,11 @@ func main() {
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
+	if strings.HasPrefix(r.URL.Path, "/ls") {
+		r.URL.Path = "/"
+		WebAdmin.SecurePath(fileRoot.ServeHTTP)(w, r)
+		return
+	}
 	if len(r.URL.Path) > 1 {
 		//Only serve files to secure paths
 		WebAdmin.SecurePath(fileRoot.ServeHTTP)(w, r)

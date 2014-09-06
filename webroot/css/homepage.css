@@ -19,10 +19,12 @@ blockquote {
 
 /*This is the container element that houses everything outside of the title bar*/
 #main {
-	max-width: 850px;
-	min-width: 800px;
+	max-width: 890px;
+	min-width: 840px;
 	margin-right: auto;
 	margin-left: auto;
+	padding-left: 20px;
+	padding-right: 20px;
 }
 
 .background {
@@ -31,17 +33,27 @@ blockquote {
 
 .content {
 	background-color: #FFFFFF;
-	padding: 20px;
+	/*padding: 20px;*/
 	color: #000000;
 	font-family:  Helvetica, calibri, sans-serif;
 }
 .headingBacker{
 	background-color: #004d00;
 	color: #FFFFFF;
-	text-align: center;
 	padding-top: 20px;
 }
-#motto{
+
+.headingForeground {
+	color: #FFFFFF;
+	max-width: 890px;
+	min-width: 840px;
+	margin-right: auto;
+	margin-left: auto;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#motto {
 	margin-top: 2px;
 	padding-bottom: 10px;
 	font-size: 10pt;
@@ -65,20 +77,24 @@ blockquote {
 	max-width: 600px; 
 }
 .body {
-	font-size: 11pt;	
+	font-size: 11pt;
 }
 .comment{
 }
 .sidebar {
 	float: right;
-	width: 250px;
+	width: 200px;
 	margin-left: 10px;
 	margin-bottom: 10px;
-	border: dashed;
 	border-top: none;
 	border-color: #11Ad11;
 	border-width: 1px;
-	font-size: 11pt
+	font-size: 9pt
+}
+.sidebar-link a {
+	font-size: 15px;
+	font-family: "Lucida Bright", Georgia, serif;
+	font-weight: bold;
 }
 .top-space {
 	/* margin-top: 15px; */ 

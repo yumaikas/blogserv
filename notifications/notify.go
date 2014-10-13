@@ -44,8 +44,8 @@ func init() {
 	emailTemplate, err = template.ParseFiles(path)
 	//Die on a failed template parse.
 	die.OnErr(err)
-	go notifyLoop()
-	go listenForAdmin()
+	// go notifyLoop()
+	// go listenForAdmin()
 }
 
 func sendEmail(toNotify []comment) {

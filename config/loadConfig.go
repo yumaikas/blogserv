@@ -1,4 +1,4 @@
-//This pacakge get's its values froma config file.
+// This pacakge get's its values froma config file.
 
 package config
 
@@ -80,7 +80,7 @@ func PostPath() string {
 type EmailInfo struct {
 	Auth         smtp.Auth
 	ToBeNotified []string
-	HostServer   string //Needs to be a valid server.com:portNum combo
+	HostServer   string // Needs to be a valid server.com:portNum combo
 	FromEmail    string
 }
 
@@ -89,7 +89,7 @@ func EmailAuth() EmailInfo {
 	defer m.RUnlock()
 	p := conf.EmailNotifyConfig.PlainAuth
 
-	//slice to the last instace of :, so as to get the address
+	// slice to the last instace of :, so as to get the address
 	host := p.Host[:strings.LastIndex(p.Host, ":")]
 	eConf := EmailInfo{
 		smtp.PlainAuth(p.Identity, p.UserName, p.Password, host),
@@ -118,7 +118,7 @@ const localPath = `config.json`
 
 // Look in the current folder for a config file, and then in location specified by the environment variable
 func defaultConfig() (*blogservConfig, error) {
-	//Return default config based on settings
+	// Return default config based on settings
 	var p string
 	os.Stat(localPath)
 	if info, err := os.Stat(localPath); err == nil && info.Mode().IsRegular() {

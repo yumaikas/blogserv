@@ -53,7 +53,7 @@ func CommentToDB(c akismet.Comment, arName string) error {
 		return rb(err)
 	}
 
-	//This is what is going in to the db
+	// This is what is going in to the db
 	in := struct {
 		UserID, ArticleID int
 		Content           string
@@ -79,7 +79,7 @@ func CommentToDB(c akismet.Comment, arName string) error {
 	if err != nil {
 		return rb(err)
 	}
-	//The results and error(if any)
+	// The results and error(if any)
 	q := `Insert into Comments (UserID, ArticleID, Content, GUID, Status) 
 			values (?, ?, ?, ?, ?)`
 	r, err := tx.Exec(q, in.UserID, in.ArticleID, in.Content, guid, "Shown")
@@ -122,8 +122,8 @@ func generateCommentGuid(db *sql.Tx) (string, error) {
 func NewCommentGuid(tx *sql.Tx) (string, error) {
 	for {
 		guid, err := generateCommentGuid(tx)
-		//only try again if a duplicate was created
-		//Pass other error up, or return successfully
+		// only try again if a duplicate was created
+		// Pass other error up, or return successfully
 		if err == duplicateGUIDError {
 			continue
 		}

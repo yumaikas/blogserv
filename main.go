@@ -1,6 +1,6 @@
 package main
 
-//This is a simple http webserver.
+// This is a simple http webserver.
 import (
 	"bytes"
 	"fmt"
@@ -24,17 +24,17 @@ type Page struct {
 }
 
 func init() {
-	//If any of these functions fail, we aren't ready for the server to run.
-	//They all call log.Fatal(), so the user will get a warning when they run.
-	//akismet_init()
+	// If any of these functions fail, we aren't ready for the server to run.
+	// They all call log.Fatal(), so the user will get a warning when they run.
+	// akismet_init()
 
 	go template_init()
 	go listenForAdmin()
 }
 
 func addClickOnceMimeTypes() {
-	//These extensions are to make ClickOnce deployments work properly, so that
-	//Chrome and Firefox will work corretly with the.
+	// These extensions are to make ClickOnce deployments work properly, so that
+	// Chrome and Firefox will work corretly with the.
 	mime.AddExtensionType(".application", "application/x-ms-application")
 	mime.AddExtensionType(".manifest", "application/x-ms-manifest")
 	mime.AddExtensionType(".deploy", "application/octet-stream")
@@ -48,10 +48,10 @@ func assignPaths() {
 	node := http.HandleFunc
 	secure := WebAdmin.SecurePath
 	authed := WebAdmin.AuthenticatedPath
-	//The feed can go over http
+	// The feed can go over http
 	http.HandleFunc("/blog/feed.xml", getFeed)
 
-	//Everything else is either https or https and authenticated as an admin
+	// Everything else is either https or https and authenticated as an admin
 	node("/", root)
 	node("/index.html", secure(home))
 	node("/blog", secure(home))
@@ -60,10 +60,10 @@ func assignPaths() {
 	node("/api/", secure(api))
 	node("/blog/login", secure(loginRoute))
 
-	//This is secured, and fires auth checks, redirecting to longing if a failure happened
-	//node("/admin", secure(adminStart))
+	// This is secured, and fires auth checks, redirecting to longing if a failure happened
+	// node("/admin", secure(adminStart))
 
-	//The entire admin space needs to be authenticated
+	// The entire admin space needs to be authenticated
 	node("/admin/create/", authed(create))
 	node("/admin/home", authed(adminHome))
 	node("/admin/login", authed(performLogin))
@@ -75,8 +75,8 @@ func assignPaths() {
 	node("/admin/deleteComment/", authed(deleteComment))
 }
 func main() {
-	//Needs to be called inside main() for some reason. I suspect that it has
-	//something to do with initization order, but am not sure.
+	// Needs to be called inside main() for some reason. I suspect that it has
+	// something to do with initization order, but am not sure.
 	addClickOnceMimeTypes()
 	assignPaths()
 
@@ -95,14 +95,14 @@ func root(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(r.URL.Path) > 1 {
-		//Only serve files to secure paths
+		// Only serve files to secure paths
 		WebAdmin.SecurePath(fileRoot.ServeHTTP)(w, r)
 		return
 	}
 	home(w, r)
 }
 
-//Requires auth
+// Requires auth
 func adminHome(w http.ResponseWriter, r *http.Request, userID string) {
 	b := new(bytes.Buffer)
 	ars, err := AdminArticles()
@@ -186,7 +186,7 @@ func performLogin(w http.ResponseWriter, r *http.Request, userID string) {
 	http.Redirect(w, r, "/admin/home", 303)
 }
 
-//Requires Auth
+// Requires Auth
 func performLogout(w http.ResponseWriter, r *http.Request, userID string) {
 	WebAdmin.ClearToken(userID)
 	c, err := r.Cookie("authToken")
@@ -198,7 +198,7 @@ func performLogout(w http.ResponseWriter, r *http.Request, userID string) {
 	http.Redirect(w, r, "/blog/", 303)
 }
 
-//Requires Auth
+// Requires Auth
 func create(w http.ResponseWriter, r *http.Request, userID string) {
 	if r.Method == "GET" {
 		err := createSetup(w, r)
@@ -223,18 +223,18 @@ func create(w http.ResponseWriter, r *http.Request, userID string) {
 	fmt.Fprint(w, Err404.Error())
 }
 
-//This function needs to be auth verified before calling.
+// This function needs to be auth verified before calling.
 func createSetup(w http.ResponseWriter, r *http.Request) error {
 	data := struct {
 		IsAdmin bool
 	}{
-		//Used because admin-ness was asserted earlier
+		// Used because admin-ness was asserted earlier
 		IsAdmin: true,
 	}
 	buf := &bytes.Buffer{}
 	err := blogTemps.ExecuteTemplate(buf, "creator", data)
 	if err != nil {
-		//Errors are written at the level above this
+		// Errors are written at the level above this
 		return err
 	}
 	buf.WriteTo(w)
@@ -263,7 +263,7 @@ func createSubmit(w http.ResponseWriter, r *http.Request) error {
 	return err
 }
 
-//Requires Auth
+// Requires Auth
 func edit(w http.ResponseWriter, r *http.Request, userID string) {
 	if r.Method == "GET" {
 		err := editSetup(w, r)
@@ -329,7 +329,7 @@ func saveArticle(w http.ResponseWriter, r *http.Request, articleTitle, publishSt
 	return err
 }
 
-//This function needs to be auth verified before calling.
+// This function needs to be auth verified before calling.
 func editSetup(w http.ResponseWriter, r *http.Request) error {
 
 	fmt.Println(r.URL.Path)
@@ -349,7 +349,7 @@ func editSetup(w http.ResponseWriter, r *http.Request) error {
 		Content: ar.Content,
 		Title:   ar.Title,
 		URL:     ar.URL,
-		//Used because admin-ness was asserted earlier
+		// Used because admin-ness was asserted earlier
 		IsAdmin: true,
 	}
 

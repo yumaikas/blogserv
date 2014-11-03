@@ -21,11 +21,11 @@ var (
 	blogTemps template.Template
 )
 
-//Take the first two lines and use it for an article preview
+// Take the first two lines and use it for an article preview
 func Preview(s string) template.HTML {
 	var preview string
 	for idx, tx := range strings.Split(s, "\n") {
-		//Only take 2 lines
+		// Only take 2 lines
 		if idx > 2 {
 			break
 		}
@@ -53,13 +53,13 @@ func (ar *Article) IsPublished() bool {
 	return arts.IsPublished(art)
 }
 
-//Html escape the content of the article so that RSS readers can parse it.
+// Html escape the content of the article so that RSS readers can parse it.
 func (ar *Article) RssHTML() template.HTML {
 	rss := template.HTMLEscapeString(ar.Content)
 	return template.HTML(rss)
 }
 
-//This content needs to be trusted
+// This content needs to be trusted
 func (ar *Article) HTMLContent() template.HTML {
 	ar.Content = string(md.MarkdownCommon([]byte(ar.Content)))
 	return template.HTML(addPrettyPrint(ar.Content))
@@ -89,7 +89,7 @@ func (ars articleList) render(out io.Writer) (err error) {
 	return
 }
 
-//This is so that URL's can be TitleCased but page titles are spaced
+// This is so that URL's can be TitleCased but page titles are spaced
 func spaceTitleCase(str string) string {
 	var newTitle []rune
 	for _, c := range str {
@@ -145,8 +145,8 @@ func template_init() {
 	}
 }
 
-//Prepare the templates for the server, then test
-//TODO: generalize this so that it uses a config file to get the list of templates used, or just walks a directory.
+// Prepare the templates for the server, then test
+// TODO: generalize this so that it uses a config file to get the list of templates used, or just walks a directory.
 func template_load() template.Template {
 
 	funcs := template.FuncMap{
@@ -158,12 +158,12 @@ func template_load() template.Template {
 	die.OnErr(err)
 	// This function will make a fatal log if it fails, exiting the process
 	loadTemplate := func(file string) {
-		//template path has a trailing slash so that file name
-		//doesn't need to have leading one
+		// template path has a trailing slash so that file name
+		// doesn't need to have leading one
 		temp, err := ioutil.ReadFile(config.TemplatePath() + file)
 		templ := string(temp)
 		die.OnErr(err)
-		//No name is needed here as the templates are expected to supply their own names.
+		// No name is needed here as the templates are expected to supply their own names.
 		_, err = temps.Parse(templ)
 		die.OnErr(err)
 	}

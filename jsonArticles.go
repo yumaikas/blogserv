@@ -24,15 +24,15 @@ func api(w http.ResponseWriter, r *http.Request) {
 	ars, err1 := jsonArticles()
 	buf, err := json.Marshal(ars)
 	if err != nil {
-		//Render error straight to buffer. Debug only.
+		// Render error straight to buffer. Debug only.
 		fmt.Fprintln(w, err1)
 		fmt.Fprint(w, err)
 		return
 	}
 	fmt.Fprint(w, string(buf))
-	//TODO: implemnt a rest-ful API here. Current
-	//Get the method to dispacth to.
-	//a := r.URL.Path[len("/api/"):]
+	// TODO: implemnt a rest-ful API here. Current
+	// Get the method to dispacth to.
+	// a := r.URL.Path[len("/api/"):]
 }
 
 func jsonArticles() ([]jsonArticle, error) {

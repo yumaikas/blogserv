@@ -8,9 +8,9 @@ import (
 )
 
 var feed = &feeds.Feed{
-	//TODO: change this to be read from a config file
+	// TODO: change this to be read from a config file
 	Title:       "Jungle Coder",
-	Link:        &feeds.Link{Href: "http://www.junglecoder.com/blog/"},
+	Link:        &feeds.Link{Href: "http:// www.junglecoder.com/blog/"},
 	Description: "The musings of a third culture coder and missionary kid",
 	Author:      &feeds.Author{"Andrew Owen", "yumaikas94@gmail.com"},
 }
@@ -40,7 +40,7 @@ func renderFeed(w io.Writer) error {
 }
 
 func (ar Article) RSSLink() *feeds.Link {
-	//The website name is currently hardcoded. This will need to change in the future
-	url := "http://www.junglecoder.com/blog/" + ar.URL
+	// The website name is currently hardcoded. This will need to change in the future
+	url := "http:// www.junglecoder.com/blog/" + ar.URL
 	return &feeds.Link{Href: url}
 }

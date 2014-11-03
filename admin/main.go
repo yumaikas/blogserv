@@ -72,7 +72,7 @@ func sendAdminMessage(message, port string) {
 
 	c, err := net.Dial("tcp", "localhost:"+port)
 	if err != nil {
-		//nothing else we can do
+		// nothing else we can do
 		fmt.Println(message + " failed")
 		return
 	}
@@ -119,8 +119,8 @@ func setPassword(password, userID string) {
 func testEmail() {
 	auth := config.EmailAuth()
 	fmt.Printf(auth.HostServer)
-	//fmt.Printf("%v", auth)
-	//fmt.Printf("%v\n", auth.HostServer)
+	// fmt.Printf("%v", auth)
+	// fmt.Printf("%v\n", auth.HostServer)
 	fmt.Printf("%v", auth.Auth)
 	err := smtp.SendMail(auth.HostServer, auth.Auth, auth.FromEmail, auth.ToBeNotified, []byte(
 		`Content-Type: text/html

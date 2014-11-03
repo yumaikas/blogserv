@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/russross/blackfriday"
 	"io/ioutil"
+
+	"github.com/russross/blackfriday"
 	secret "github.com/yumaikas/blogserv/config"
 	//"os"
 	"bytes"
@@ -43,7 +44,7 @@ func dumpDb() {
 
 func readArticles() {
 
-	//file := os.Open(root + `\dump.html`)
+	// file := os.Open(root + `\dump.html`)
 	files, err := ioutil.ReadDir(root)
 	if err != nil {
 		fmt.Print(err.Error())
@@ -80,7 +81,7 @@ func readArticles() {
 			fmt.Println(ar)
 			insert(*ar)
 		}
-		//Here we deliberatly do nothing
+		// Here we deliberatly do nothing
 	}
 }
 

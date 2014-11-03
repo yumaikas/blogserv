@@ -13,15 +13,15 @@ func NL() string {
 }
 
 var (
-	//Individual tags
+	// Individual tags
 	tg = regexp.MustCompile(`(?m)^(\w+):"([^"]([^"]|\")*)"$`)
-	//Match the article text
+	// Match the article text
 	tx_re = regexp.MustCompile(`(?s)Text:\{(.+)\}:Text`)
-	//Match the tags before the article text (needs to be split by newlines for tg to match)
+	// Match the tags before the article text (needs to be split by newlines for tg to match)
 	tags = regexp.MustCompile(`(?s)^(.+)Text:{`)
 )
 
-//c is the content of the article from the file.
+// c is the content of the article from the file.
 func parseFile(c string) (*article, error) {
 
 	if !tags.MatchString(c) {
@@ -33,7 +33,7 @@ func parseFile(c string) (*article, error) {
 		l = strings.TrimSpace(l)
 		if tg.MatchString(l) {
 			m := tg.FindStringSubmatch(l)
-			//assign based on tag
+			// assign based on tag
 			switch m[1] {
 			case "Title":
 				fmt.Printf("Title: %v\n", m[2])
@@ -44,14 +44,14 @@ func parseFile(c string) (*article, error) {
 				fmt.Printf("PublishStage: %v\n", m[2])
 				a.PublishStage = m[2]
 			}
-			//For debugging
-			//fmt.Printf("tag: %q, value: %q\n", m[1], m[2])
+			// For debugging
+			// fmt.Printf("tag: %q, value: %q\n", m[1], m[2])
 		}
 	}
-	//Grab all the text.
+	// Grab all the text.
 	txt := tx_re.FindStringSubmatch(c)
 	a.Content = txt[1]
-	//Validate the article
+	// Validate the article
 	errBuf := new(bytes.Buffer)
 	if a.URL == "" {
 		errBuf.WriteString("Article URL is empty.\n")
@@ -65,7 +65,7 @@ func parseFile(c string) (*article, error) {
 	if errBuf.Len() > 0 {
 		return nil, errors.New(errBuf.String())
 	}
-	//For debugging
-	//fmt.Println(txt[1])
+	// For debugging
+	// fmt.Println(txt[1])
 	return a, nil
 }

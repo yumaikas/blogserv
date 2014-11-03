@@ -1,4 +1,4 @@
-//TODO: finish the auth check
+// TODO: finish the auth check
 
 package WebAdmin
 
@@ -18,13 +18,13 @@ func err404ToWriter(w http.ResponseWriter) {
 	w.Write([]byte("Webpage does not exist!"))
 }
 
-//Standard web func
+// Standard web func
 type WebFunc func(http.ResponseWriter, *http.Request)
 
-//Ensures that SSL is enabled for a path
+// Ensures that SSL is enabled for a path
 func SecurePath(serveRequest WebFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//IsLoopback check for development only. Should be configable to disable.
+		// IsLoopback check for development only. Should be configable to disable.
 		if IsLoopback(r) || CheckHTTPS(w, r) {
 			serveRequest(w, r)
 		} else {
@@ -33,10 +33,10 @@ func SecurePath(serveRequest WebFunc) http.HandlerFunc {
 	}
 }
 
-//Type for func that must be authenticated. If authentication succeeds, send a user string on the last parameter
+// Type for func that must be authenticated. If authentication succeeds, send a user string on the last parameter
 type AuthedFunc func(w http.ResponseWriter, r *http.Request, userID string)
 
-//Ensures that the user is authenticated before executing this path
+// Ensures that the user is authenticated before executing this path
 func AuthenticatedPath(protectedFunc AuthedFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if userID, ok := AttemptAuth(w, r); ok {
@@ -48,7 +48,7 @@ func AuthenticatedPath(protectedFunc AuthedFunc) http.HandlerFunc {
 }
 
 func CheckHTTPS(w http.ResponseWriter, r *http.Request) bool {
-	//There are two possibilities
+	// There are two possibilities
 	if r.TLS == nil || !r.TLS.HandshakeComplete {
 		fmt.Println("Attempt to use unsecure connection!")
 		return false
@@ -63,20 +63,20 @@ func IsLoopback(r *http.Request) bool {
 }
 
 func AddrWithoutPort(r *http.Request) string {
-	//Take the string up to the last :, which is right before the port number
+	// Take the string up to the last :, which is right before the port number
 	return r.RemoteAddr[:strings.LastIndex(r.RemoteAddr, ":")]
 }
 
-//Use this to track timeout information.
+// Use this to track timeout information.
 type IPAddress string
 
 var attempts map[IPAddress]int
 
-//This function could be expensive, as it involved either calls to bcrypt or a time limiter
+// This function could be expensive, as it involved either calls to bcrypt or a time limiter
 func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAuth bool) {
-	//There are two possibilities, one that we have an auth cookie already,
-	//or that we have an attempt to username/password verify
-	//Code below elided for localhost checking
+	// There are two possibilities, one that we have an auth cookie already,
+	// or that we have an attempt to username/password verify
+	// Code below elided for localhost checking
 	if !CheckHTTPS(w, r) && !IsLoopback(r) {
 		fmt.Println("Attempt to connect over insecure connection. If found on production, stop server immediatelly")
 		return "", false
@@ -100,7 +100,7 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 	}()
 
 	pass, name := r.FormValue("password"), r.FormValue("userName")
-	//If either value is empty
+	// If either value is empty
 	if !(pass == "" || name == "") {
 		if !checkLoginCreds(pass, name, r.RemoteAddr) {
 			fmt.Println("Sleeping to rate limit bad requests, and to keep from DOS attacks")
@@ -116,14 +116,14 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 		return name, true
 	}
 
-	//Attempting cookie based authentication. Need to put a sleep of some sort in here...
+	// Attempting cookie based authentication. Need to put a sleep of some sort in here...
 	c, err := r.Cookie("authToken")
 	if c != nil {
 		fmt.Print("Cookie:", c.Raw, "")
 	}
 	fmt.Println("Error (if any)", err)
 	if err == nil && c.Value != "" {
-		//Get the authToken from the database
+		// Get the authToken from the database
 		fmt.Println(";lab")
 		userID, err = idFromTokenAndIP(c.Value, AddrWithoutPort(r))
 		if err != nil {
@@ -140,11 +140,11 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 }
 func sleepForBadRequest() {
 	sleepSecond, err := rand.Int(rand.Reader, big.NewInt(1000))
-	//If we can't get any randomness, recover by using 5000 milliseconds, so that we at least get rate limiting
+	// If we can't get any randomness, recover by using 5000 milliseconds, so that we at least get rate limiting
 	if err != nil {
 		sleepSecond = big.NewInt(5000)
 	}
-	//On failure to authenticate, sleep between .5 to 10 seconds. HAHAHAHAHAHAHA
+	// On failure to authenticate, sleep between .5 to 10 seconds. HAHAHAHAHAHAHA
 	time.Sleep(time.Millisecond*time.Duration(sleepSecond.Int64()) + 500)
 }
 
@@ -160,16 +160,16 @@ func AddNameCookie(w http.ResponseWriter, r *http.Request, userID string) {
 func setAuthCookie(w http.ResponseWriter, r *http.Request, token string) {
 	domain := "localhost"
 	if !IsLoopback(r) {
-		//TODO pull from config
+		// TODO pull from config
 		domain = ".junglecoder.com"
 	}
 	cookie := &http.Cookie{
-		//When testing on localhost
+		// When testing on localhost
 		Domain:   domain,
 		Value:    token,
 		HttpOnly: true,
 		Expires:  time.Now().AddDate(0, 0, 12),
-		//Security of the cookie depends on who
+		// Security of the cookie depends on who
 		Secure: !IsLoopback(r),
 		Path:   "/",
 		Name:   "authToken",

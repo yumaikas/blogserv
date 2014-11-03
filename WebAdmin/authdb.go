@@ -1,4 +1,4 @@
-//The code in here is panicky, and uses defer and recover to handle errors
+// The code in here is panicky, and uses defer and recover to handle errors
 
 package WebAdmin
 
@@ -16,7 +16,7 @@ import (
 )
 
 func ClearToken(userID string) {
-	//Blanking IP address and token
+	// Blanking IP address and token
 	setAuthToken("", userID, "")
 }
 
@@ -39,14 +39,14 @@ func idFromTokenAndIP(token, IPAddr string) (userID string, retErr error) {
 	} else if t.Before(time.Now()) {
 		return "", tokenExpired
 	}
-	//Returning named parameters.
+	// Returning named parameters.
 	return userID, nil
 }
 
 func tokenFromIDandIPAddr(userID, IPAddr string) (token string, retErr error) {
 	db, err := dbOpen()
 	defer db.Close()
-	//The token is never set, and so it is "" if this fails
+	// The token is never set, and so it is "" if this fails
 	die.OnErr(err)
 
 	var expiration string
@@ -60,7 +60,7 @@ func tokenFromIDandIPAddr(userID, IPAddr string) (token string, retErr error) {
 	} else if t.Before(time.Now()) {
 		return "", tokenExpired
 	}
-	//Returning named parameters.
+	// Returning named parameters.
 	return
 }
 
@@ -77,11 +77,11 @@ func setAuthToken(token, userID, IPAddr string) (retErr error) {
 	}
 	if num, e := res.RowsAffected(); num > 1 || e != nil {
 		die.OnErr(e)
-		//Otherwise, complain about the wrong number of rows being updated.
+		// Otherwise, complain about the wrong number of rows being updated.
 		die.OnErr(errors.New(fmt.Sprint("Wrong number of rows for user", userID, ".Please check integrity of database.")))
 	} else if num == 0 {
-		//As this is an insert, the number of rows affected shouldn't matter, since it should always be one.
-		//The main cause for it not to be one would be some kind of schema error, which would be captured into err
+		// As this is an insert, the number of rows affected shouldn't matter, since it should always be one.
+		// The main cause for it not to be one would be some kind of schema error, which would be captured into err
 		_, err = db.Exec("Insert into authToken(userID, token, IPAddress) values (?,?,?) ", userID, token, IPAddr)
 		die.OnErr(err)
 	}
@@ -104,7 +104,7 @@ func checkLoginCreds(password, userName, remoteAddr string) (canLogin bool) {
 
 	fmt.Println("asdf")
 
-	//Cast the types as needed
+	// Cast the types as needed
 	dbBuf := []byte(dbPass)
 	localBuf := []byte(password)
 
@@ -114,7 +114,7 @@ func checkLoginCreds(password, userName, remoteAddr string) (canLogin bool) {
 		fmt.Println("Invalid attempt to login from ISP", remoteAddr)
 		return false
 	} else {
-		//Code error here
+		// Code error here
 		die.OnErr(err)
 	}
 	fmt.Println("Login Creds succeeded!")

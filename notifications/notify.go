@@ -42,7 +42,7 @@ func init() {
 	var err error
 	path := config.TemplatePath() + "/email.gohtml"
 	emailTemplate, err = template.ParseFiles(path)
-	//Die on a failed template parse.
+	// Die on a failed template parse.
 	die.OnErr(err)
 	// go notifyLoop()
 	// go listenForAdmin()
@@ -55,7 +55,7 @@ func sendEmail(toNotify []comment) {
 			fmt.Println("Error while sending eamil", val)
 			debug.PrintStack()
 		}
-		//Return comments to the queue
+		// Return comments to the queue
 		for _, c := range toNotify {
 			commentChan <- c
 		}
@@ -106,7 +106,7 @@ func listenForAdmin() {
 
 func notifyLoop() {
 	toSend := make([]comment, 0)
-	//by rate limiting emails to every 15 minutes, we keep from overflowing the gmail 24 hour send limit easily.
+	// by rate limiting emails to every 15 minutes, we keep from overflowing the gmail 24 hour send limit easily.
 	tick := time.Tick(time.Minute * 15)
 	for {
 		select {
@@ -120,7 +120,7 @@ func notifyLoop() {
 				go sendEmail(toSend)
 				toSend = make([]comment, 0)
 			}
-			//Capture a comment for later sending.
+			// Capture a comment for later sending.
 		case c := <-commentChan:
 			toSend = append(toSend, c)
 		}

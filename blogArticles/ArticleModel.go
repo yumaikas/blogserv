@@ -15,7 +15,7 @@ import (
 
 type Article struct {
 	Title, URL, Content, PublishStage string
-	//This content doesn't come from my typing, it shouldn't be trusted.
+	// This content doesn't come from my typing, it shouldn't be trusted.
 	Comments       []Comment
 	Next, Previous *Article
 	IsAdmin        bool
@@ -36,7 +36,7 @@ const (
 	Deleted   string = "Deleted"
 )
 
-//Handy for debugging things
+// Handy for debugging things
 func dump(me string) string {
 	fmt.Println(me)
 	return me
@@ -49,7 +49,7 @@ func IsPublished(ar Article) bool {
 	return ar.PublishStage == Published
 }
 
-//Hand ownership of the database handle to the calling method
+// Hand ownership of the database handle to the calling method
 func dbOpen() (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", config.DbPath())
 	return db, err
@@ -62,7 +62,7 @@ func ListArticles() (arts []Article, retErr error) {
 	defer db.Close()
 	die.OnErr(err)
 
-	//The article query
+	// The article query
 	rows, err := db.Query(`
 	Select Title, URL, Content, PublishStage
 	from Articles Order by id Desc`)
@@ -87,10 +87,10 @@ func SaveArticle(ar Article) (retErr error) {
 	db.QueryRow("Select Count(URL) from Articles where URL = ?", ar.URL).Scan(&checkNum)
 	switch checkNum {
 	case 0:
-		//create article
+		// create article
 		insert(ar)
 	case 1:
-		//update article
+		// update article
 		update(ar)
 	default:
 		die.OnErr(errors.New("More than on article for a URL. Database integrity is compromised"))
@@ -146,7 +146,7 @@ func insert(ar Article) {
 	tx.Commit()
 }
 
-//Populates an article based on a title.
+// Populates an article based on a title.
 func FillArticle(URL string) (Article, error) {
 	fmt.Println("Url searching", URL)
 	var ar Article
@@ -168,7 +168,7 @@ func FillArticle(URL string) (Article, error) {
 		case sql.ErrNoRows:
 			return ar, ErrArticleNotFound
 		default:
-			//debug, for production use fmt.PrintF(err)
+			// debug, for production use fmt.PrintF(err)
 			log.Fatal(err)
 			return ar, err
 		}
@@ -262,14 +262,14 @@ type queryComment struct {
 	Args func() (int, int, string)
 }
 
-//Currently do nothing
+// Currently do nothing
 func SpamToDB(c akismet.Comment, arName string) error {
 	return nil
 }
 
 func addUser(c akismet.Comment, tx *sql.Tx) (int, error) {
-	//fmt.Print("Enter addUser")
-	//defer fmt.Print("Exit addUser")
+	// fmt.Print("Enter addUser")
+	// defer fmt.Print("Exit addUser")
 	r, err := tx.Exec("Insert into Users (screenName, Email) values (?, ?)",
 		c.Author, c.AuthorEmail)
 	if err != nil {
@@ -282,7 +282,7 @@ func addUser(c akismet.Comment, tx *sql.Tx) (int, error) {
 	case cnt != 1:
 		return 0, fmt.Errorf("%d rows affected instead of 1", cnt)
 	}
-	//Return the new userID
+	// Return the new userID
 	if id, err := r.LastInsertId(); err == nil {
 		return int(id), nil
 	}

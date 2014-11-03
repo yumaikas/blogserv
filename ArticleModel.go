@@ -1,4 +1,4 @@
-package main //blogservModels
+package main // blogservModels
 
 import (
 	"errors"
@@ -21,16 +21,16 @@ var (
 	Err500 error           = errors.New("500: Something went wrong in the server. :(")
 	akis   *akismet.Config = &akismet.Config{
 		APIKey:    config.AkismetKey(),
-		Host:      "http://www.yumaikas.com",
+		Host:      "http:// www.yumaikas.com",
 		UserAgent: akismet.UserAgentString("blogserv/0.5.1"),
 	}
-	//db *sql.DB
+	// db *sql.DB
 )
 
 type Article arts.Article
 type Comment arts.Comment
 
-//Handy for debugging things
+// Handy for debugging things
 func dump(me string) string {
 	fmt.Println(me)
 	return me
@@ -68,7 +68,7 @@ func HTMLArticles() (articleList, error) {
 	return listArticles(arts.IsPublished)
 }
 
-//Populates an article based on a title.
+// Populates an article based on a title.
 func fillArticle(URL string) (Article, error) {
 	ar, err := arts.FillArticle(URL)
 	if err == arts.ErrArticleNotFound {
@@ -126,16 +126,16 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 		case akismet.ErrInvalidKey:
 			log.Printf("Aksimet key invalid, no spam checking available.")
 		}
-		return //Nothing more we can do here for now
+		return // Nothing more we can do here for now
 	}
 
-	//Notify here. send the request in.
+	// Notify here. send the request in.
 	err = arts.CommentToDB(comment, articleName)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	//Add a successful comment to the notification
+	// Add a successful comment to the notification
 	notifications.NotifyComment(arts.Comment{UserName: comment.Author, Content: comment.Content},
 		comment.AuthorEmail,
 		articleName,
@@ -144,10 +144,10 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 	redirect()
 }
 
-//Make to only redirect when the referer is from the website. I don't want a open redirect relay
+// Make to only redirect when the referer is from the website. I don't want a open redirect relay
 var (
-	loopbackReferer = regexp.MustCompile(`http://localhost:\d+/blog/(\w+)`)
-	//TODO: localize this to pull host value from config
+	loopbackReferer = regexp.MustCompile(`http:// localhost:\d+/blog/(\w+)`)
+	// TODO: localize this to pull host value from config
 	productionReferer = regexp.MustCompile(`https://(www)?\.junglecoder\.com:(\d+)?/blog/(\w+)`)
 )
 
@@ -155,7 +155,7 @@ var showComment = adminComment("/admin/showComment/", arts.ShowComment)
 var hideComment = adminComment("/admin/hideComment/", arts.HideComment)
 var deleteComment = adminComment("/admin/deleteComment/", arts.DeleteComment)
 
-//This is a template for comment administration
+// This is a template for comment administration
 func adminComment(path string, adminAction func(string) error) WebAdmin.AuthedFunc {
 	return func(w http.ResponseWriter, r *http.Request, userID string) {
 		guid := r.URL.Path[len(path):]
@@ -176,7 +176,7 @@ func adminComment(path string, adminAction func(string) error) WebAdmin.AuthedFu
 	}
 }
 
-//These are the values that are populated in the comment.
+// These are the values that are populated in the comment.
 /*
 	    UserIP:      r.RemoteAddr,
 		UserAgent:   r.UserAgent(),

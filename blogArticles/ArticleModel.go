@@ -173,52 +173,55 @@ func FillArticle(URL string) (Article, error) {
 			return ar, err
 		}
 	}
-	loadRow := func(ar *Article, id int) error {
-		return db.QueryRow(`Select Title, URL, PublishStage from Articles where id = ? `, id).
-			Scan(&ar.Title, &ar.URL, &ar.PublishStage)
-	}
+
+	var p Article
 	var n Article
-	err = loadRow(&n, articleId+1)
-	switch err {
-	case nil:
-		_ = ""
-	case sql.ErrNoRows:
-		_ = ""
-	default:
-		return ar, err
+	arts := []*Article{&p, &n}
+
+	// Pull the previous row in the union first, then the next row. s
+	artRows, err := db.Query(`
+		Select Url, Title, id from Articles
+		where id = (Select MAX(id) from Articles where id < ? and PublishStage = 'Published')
+		union 
+		Select Url, Title, id from Articles 
+		where id = (Select MIN(id) from Articles where id > ? and PublishStage = 'Published')
+		order by id asc`, articleId, articleId)
+
+	if err == nil {
+		i := 0
+		lastId := 0
+		for artRows.Next() {
+			ref := arts[i]
+			i++
+			fmt.Println("Scanning errors:", artRows.Scan(&ref.URL, &ref.Title, &lastId))
+		}
+		// Swap the articles if there only the next article showed up.
+		if i == 1 && lastId > articleId {
+			n = p
+			p = Article{}
+		}
+	} else {
+		return Article{}, err
 	}
 
-	fmt.Println(n, "HEX")
-	var p Article
-	err = loadRow(&p, articleId-1)
-	fmt.Println(err)
-	switch err {
-	case nil:
-		_ = ""
-	case sql.ErrNoRows:
-		_ = ""
-	default:
-		return ar, err
-	}
-	fmt.Println(p, "CODE")
 	ar.Next = &n
 	ar.Previous = &p
 
-	//Get the comments for the article
+	// Get the comments for the article
 	commentQ, err := db.Prepare(`
 	Select U.screenName, C.Content, C.Status, C.Guid from 
 	Comments as C
 	inner join Users as U on C.UserID = U.id
 	where C.ArticleID = ?`)
 	if err != nil {
-		//debug, for production use fmt.PrintF(err)
+		// debug, for production use fmt.PrintF(err)
 		log.Fatal(err)
 		return ar, err
 	}
 
 	rows, err := commentQ.Query(articleId)
 	if err != nil {
-		//debug, for production use fmt.PrintF(err)
+		// debug, for production use fmt.PrintF(err)
 		log.Fatal(err)
 		return ar, err
 	}
@@ -229,7 +232,7 @@ func FillArticle(URL string) (Article, error) {
 		var c Comment
 		err = rows.Scan(&c.UserName, &c.Content, &c.Status, &c.GUID)
 		if err != nil {
-			//debug, for production use fmt.Printf(err)
+			// debug, for production use fmt.Printf(err)
 			log.Fatal(err)
 			return ar, err
 		}
@@ -244,8 +247,8 @@ func FillArticle(URL string) (Article, error) {
 	return ar, nil
 }
 
-//Add code to check for the user, and insert the user if need be
-//These are the values that are populated in the comment.
+// Add code to check for the user, and insert the user if need be
+// These are the values that are populated in the comment.
 /*
 	    UserIP:      r.RemoteAddr,
 		UserAgent:   r.UserAgent(),

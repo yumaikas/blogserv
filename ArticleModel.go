@@ -104,15 +104,6 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 		AuthorEmail: r.FormValue("email"),
 		Content:     r.FormValue("Comment"),
 	}
-	if WebAdmin.IsLoopback(r) {
-		err := arts.CommentToDB(comment, articleName)
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		redirect()
-		return
-	}
 	err := akismet.CommentCheck(akis, comment)
 	if err != nil {
 		switch err {
@@ -132,6 +123,7 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 	// Notify here. send the request in.
 	err = arts.CommentToDB(comment, articleName)
 	if err != nil {
+		fmt.Println("Error when submitting comment: ", err)
 		http.Error(w, err.Error(), 500)
 		return
 	}

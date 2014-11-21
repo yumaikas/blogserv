@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"net"
 	"net/http"
-	"net/smtp"
 	"runtime/debug"
 	"time"
 
@@ -44,8 +43,8 @@ func init() {
 	emailTemplate, err = template.ParseFiles(path)
 	// Die on a failed template parse.
 	die.OnErr(err)
-	// go notifyLoop()
-	// go listenForAdmin()
+	go notifyLoop()
+	go listenForAdmin()
 }
 
 func sendEmail(toNotify []comment) {
@@ -74,8 +73,8 @@ func sendEmail(toNotify []comment) {
 		fmt.Println(err.Error())
 		return
 	}
-	auth := config.EmailAuth()
-	die.OnErr(smtp.SendMail(auth.HostServer, auth.Auth, auth.FromEmail, auth.ToBeNotified, buf.Bytes()))
+	// auth := config.EmailAuth()
+	// die.OnErr(smtp.SendMail(auth.HostServer, auth.Auth, auth.FromEmail, auth.ToBeNotified, buf.Bytes()))
 	// keep the notifications from going back on the queue
 	toNotify = nil
 }

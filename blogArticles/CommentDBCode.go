@@ -37,8 +37,8 @@ func HideComment(guid string) error {
 }
 
 func CommentToDB(c akismet.Comment, arName string) error {
-	fmt.Print("Enter CommentToDB")
-	defer fmt.Print("Exit CommentToDB")
+	fmt.Println("Enter CommentToDB")
+	defer fmt.Println("Exit CommentToDB")
 	db, err := dbOpen()
 	defer db.Close()
 	if err != nil {

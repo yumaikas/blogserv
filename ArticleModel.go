@@ -136,11 +136,11 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 	redirect()
 }
 
-// Make to only redirect when the referer is from the website. I don't want a open redirect relay
+// Made to only redirect when the referer is from the website. I don't want a open redirect relay
 var (
-	loopbackReferer = regexp.MustCompile(`http:// localhost:\d+/blog/(\w+)`)
+	loopbackReferer = regexp.MustCompile(`^http://localhost:\d*/blog/(.*)`)
 	// TODO: localize this to pull host value from config
-	productionReferer = regexp.MustCompile(`https://(www)?\.junglecoder\.com:(\d+)?/blog/(\w+)`)
+	productionReferer = regexp.MustCompile(`^https://(www)?\.junglecoder\.com:(\d+)?/blog/(.*)`)
 )
 
 var showComment = adminComment("/admin/showComment/", arts.ShowComment)
@@ -160,9 +160,13 @@ func adminComment(path string, adminAction func(string) error) WebAdmin.AuthedFu
 		}
 		fmt.Println("Referer:", r.Referer())
 		if WebAdmin.IsLoopback(r) && loopbackReferer.MatchString(r.Referer()) {
+			fmt.Println("Redirecting on loopback")
 			http.Redirect(w, r, r.Referer(), 303)
+			return
 		} else if productionReferer.MatchString(r.Referer()) {
+			fmt.Println("Redirecting on production")
 			http.Redirect(w, r, r.Referer(), 303)
+			return
 		}
 		http.Redirect(w, r, "/admin/home", 303)
 	}

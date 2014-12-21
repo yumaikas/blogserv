@@ -51,12 +51,12 @@ func assignPaths() {
 	// The feed can go over http
 	http.HandleFunc("/blog/feed.xml", getFeed)
 
-	// Everything else is either https or https and authenticated as an admin
+	// None of the mere content serving is protected at the moment.
 	node("/", root)
-	node("/index.html", secure(home))
-	node("/blog", secure(home))
-	node("/blog/", secure(getArticle))
-	node("/submitComment/", secure(postComment))
+	node("/index.html", home)
+	node("/blog", home)
+	node("/blog/", getArticle)
+	node("/submitComment/", postComment)
 	node("/api/", secure(api))
 	node("/blog/login", secure(loginRoute))
 
@@ -125,7 +125,6 @@ func adminHome(w http.ResponseWriter, r *http.Request, userID string) {
 		fmt.Fprintf(w, "%s", Err500.Error())
 		return
 	}
-
 	b.WriteTo(w)
 }
 func home(w http.ResponseWriter, r *http.Request) {
@@ -145,7 +144,6 @@ func home(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s", Err500.Error())
 		return
 	}
-
 	b.WriteTo(w)
 }
 

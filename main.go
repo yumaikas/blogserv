@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"mime"
+	"sync"
 	"net/http"
 	"strings"
 
@@ -46,7 +47,7 @@ func addClickOnceMimeTypes() {
 }
 func assignPaths() {
 	node := http.HandleFunc
-	secure := WebAdmin.SecurePath
+	// secure := WebAdmin.SecurePath
 	authed := WebAdmin.AuthenticatedPath
 	// The feed can go over http
 	http.HandleFunc("/blog/feed.xml", getFeed)
@@ -57,8 +58,8 @@ func assignPaths() {
 	node("/blog", home)
 	node("/blog/", getArticle)
 	node("/submitComment/", postComment)
-	node("/api/", secure(api))
-	node("/blog/login", secure(loginRoute))
+	node("/api/", api)
+	node("/blog/login", loginRoute)
 
 	// This is secured, and fires auth checks, redirecting to longing if a failure happened
 	// node("/admin", secure(adminStart))
@@ -80,23 +81,39 @@ func main() {
 	addClickOnceMimeTypes()
 	assignPaths()
 
-        cert := "/home/yumaikas/ssl/jungleCoderCert.pem"
-        key := "/home/yumaikas/ssl/jungleCoderKey.pem"
-        err := http.ListenAndServeTLS(":443", cert, key, logMux)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+        // cert := "/etc/letsencrypt/live/junglecoder.com/fullchain.pem"
+	// key := "/etc/letsencrypt/live/junglecoder.com/privkey.pem"
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	/*
+	go func() {
+		err := http.ListenAndServeTLS(":443", cert, key, logMux)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		wg.Done()
+	}()
+	*/
+	go func() {
+		err := http.ListenAndServe(":8080", logMux)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		wg.Done()
+	}()
+	wg.Wait()
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.Path, "/ls") {
 		r.URL.Path = "/"
-		WebAdmin.SecurePath(fileRoot.ServeHTTP)(w, r)
+		(fileRoot.ServeHTTP)(w, r)
 		return
 	}
 	if len(r.URL.Path) > 1 {
 		// Only serve files to secure paths
-		WebAdmin.SecurePath(fileRoot.ServeHTTP)(w, r)
+		(fileRoot.ServeHTTP)(w, r)
 		return
 	}
 	home(w, r)
@@ -180,6 +197,7 @@ func getArticle(w http.ResponseWriter, r *http.Request) {
 
 // This path needs to be protected at the tree level
 func performLogin(w http.ResponseWriter, r *http.Request, userID string) {
+	fmt.Println("Performing login!")
 	WebAdmin.AddNameCookie(w, r, userID)
 	http.Redirect(w, r, "/admin/home", 303)
 }
@@ -258,6 +276,7 @@ func createSubmit(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		fmt.Println("Error in saving article", err)
 	}
+	http.Redirect(w, r, "/admin/edit/"+url, 303)
 	return err
 }
 

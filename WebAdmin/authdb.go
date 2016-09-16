@@ -23,14 +23,16 @@ func ClearToken(userID string) {
 var tokenExpired = errors.New("Token expired")
 
 func idFromTokenAndIP(token, IPAddr string) (userID string, retErr error) {
+	fmt.Println("HEXAGOAL:", token, IPAddr)
 	db, err := dbOpen()
 	defer db.Close()
 	if err != nil {
 		return "", err
 	}
 	var expiration string
-	q := "Select UserID, Expiration from AuthToken where Token = ? and IPAddress = ? limit 1"
-	die.OnErr(db.QueryRow(q, token, IPAddr).Scan(&userID, &expiration))
+	// q := "Select UserID, Expiration from AuthToken where Token = ? and IPAddress = ? limit 1"
+	q := "Select UserID, Expiration from AuthToken where Token = ? limit 1"
+	die.OnErr(db.QueryRow(q, token/*, IPAddr*/).Scan(&userID, &expiration))
 	t, terr := time.Parse(time.RFC3339, expiration)
 	if terr != nil {
 		return "", terr
@@ -50,8 +52,8 @@ func tokenFromIDandIPAddr(userID, IPAddr string) (token string, retErr error) {
 	die.OnErr(err)
 
 	var expiration string
-	q := "Select token, Expiration from authToken where UserID = ? and IPAddress = ? limit 1"
-	die.OnErr(db.QueryRow(q, userID, IPAddr).Scan(&token, &expiration))
+	q := "Select token, Expiration from authToken where UserID = ? limit 1"
+	die.OnErr(db.QueryRow(q, userID).Scan(&token, &expiration))
 	t, terr := time.Parse(time.RFC3339, expiration)
 	if terr != nil {
 		return "", err

@@ -76,13 +76,6 @@ var attempts map[IPAddress]int
 func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAuth bool) {
 	// There are two possibilities, one that we have an auth cookie already,
 	// or that we have an attempt to username/password verify
-	// Code below elided for localhost checking
-	if !CheckHTTPS(w, r) && !IsLoopback(r) {
-		fmt.Println("Attempt to connect over insecure connection. If found on production, stop server immediatelly")
-		return "", false
-	} else if IsLoopback(r) {
-		fmt.Println("Connecting over Loopback http connection. Information is not encrypted, but is internal.")
-	}
 
 	if err := r.ParseForm(); err != nil {
 		return "", false
@@ -113,6 +106,7 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 		fmt.Println("Generated auth token")
 		err = setAuthToken(token, name, AddrWithoutPort(r))
 		die.OnErr(err)
+		fmt.Println("Saved auth token")
 		return name, true
 	}
 

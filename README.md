@@ -90,7 +90,7 @@ To set it up on your VPS/server you will need to at least do the following:
 
 10-  If all that worked, the blog should be listeing on port 6060.
 
-## Exteneded setup
+## Extended setup
 
 To be able to create and edit articles as a blog administrator, you will need to setup a web account on the server. If the above has completed succesfully, then all that needs to be done is to use the admin command(use a space in front of the command to keep it from going to the bash history):
 

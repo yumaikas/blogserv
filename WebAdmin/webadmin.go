@@ -115,10 +115,12 @@ func AttemptAuth(w http.ResponseWriter, r *http.Request) (userID string, validAu
 	if c != nil {
 		fmt.Print("Cookie:", c.Raw, "")
 	}
-	fmt.Println("Error (if any)", err)
+	if err != nil {
+		fmt.Println("Error (if any)", err)
+		return "", false
+	}
 	if err == nil && c.Value != "" {
 		// Get the authToken from the database
-		fmt.Println(";lab")
 		userID, err = idFromTokenAndIP(c.Value, AddrWithoutPort(r))
 		if err != nil {
 			fmt.Println("Error in checking database for authentication token" + err.Error())

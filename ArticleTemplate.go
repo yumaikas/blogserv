@@ -84,6 +84,12 @@ func Render404(out http.ResponseWriter) {
 	die.OnErr(blogTemps.ExecuteTemplate(out, "notFound", nil))
 }
 
+// Render a list of commetns using the
+func renderCommentsAdmin(comments []arts.CommentAdminRow, out io.Writer) error {
+	// TODO: Create commentAdmin template
+	return blogTemps.ExecuteTemplate(out, "commentList", comments)
+}
+
 func (ars articleList) render(out io.Writer) (err error) {
 	err = blogTemps.ExecuteTemplate(out, "blogRoll", ars)
 	return
@@ -153,6 +159,7 @@ func template_load() template.Template {
 		"splitUpper": spaceTitleCase,
 		"preview":    Preview,
 		"isDraft":    arts.IsDraft,
+		"add":        func(x, y int) int { return x + y },
 	}
 	temps, err := template.New("sidebar").Funcs(funcs).Parse("")
 	die.OnErr(err)
@@ -176,6 +183,7 @@ func template_load() template.Template {
 	loadTemplate("creator.gohtml")
 	loadTemplate("serverError.gohtml")
 	loadTemplate("notFound.gohtml")
+	loadTemplate("commentList.gohtml")
 
 	return *temps
 }

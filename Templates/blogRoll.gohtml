@@ -28,15 +28,15 @@
 					{{end}}
 					{{/*The Model for this page is literally a list of articles. */}} 
 					{{range .}}
-					<h2>
-						<a class="title" href="/blog/{{.URL}}">{{.Title}} {{if isDraft .}} - Draft{{end}}</a> 
-						{{if .IsAdmin }}
-						<a class="title" href="/admin/edit/{{.URL}}"> | (Edit)</a>
-						{{end}}
-					</h2>
-					{{/*The content will need to be valid html, but aware that it will be in an article*/}} 
-					{{preview .HTMLContent}}<a href="/blog/{{.URL}}" >Read more...</a>
-					<hr>
+                        <h2>
+                            <a class="title" href="/blog/{{.URL}}">{{.Title}} {{if isDraft .}} - Draft{{end}}</a> 
+                            {{if .IsAdmin }}
+                            <a class="title" href="/admin/edit/{{.URL}}"> | (Edit)</a>
+                            {{end}}
+                        </h2>
+                        {{/*The content will need to be valid html, but aware that it will be in an article*/}} 
+                        {{preview .HTMLContent}}<a href="/blog/{{.URL}}" >Read more...</a>
+                        <hr>
 					{{end}}
 			</div>
 		</div>

@@ -24,6 +24,22 @@ func execGUIDquery(query, guid string) error {
 	_, err = db.Exec(query, guid)
 	return err
 }
+
+func ArticleFromComment(guid string) (string, error) {
+	db, err := dbOpen()
+	defer db.Close()
+
+	var articlePath string
+	err = db.QueryRow(
+		` Select URL 
+			from Articles
+			inner join Comments on Articles.id = Comments.ArticleID
+			where Comments.GUID = ?
+	`, guid).Scan(
+		&articlePath)
+	return articlePath, err
+}
+
 func ShowComment(guid string) error {
 	return execGUIDquery(`Update Comments Set Status = 'Shown' where guid = ?`, guid)
 }
@@ -36,9 +52,53 @@ func HideComment(guid string) error {
 	return execGUIDquery(`Update Comments Set Status = 'Hidden' where guid = ?`, guid)
 }
 
+// This is a type that might not be very necessary atm, but yeah
+type CommentAdminRow struct {
+	ArticleTitle   string
+	UserScreenName string
+	UserEmail      string
+	Content        string
+	Status         string
+	GUID           string
+}
+
+func ListAllComments() ([]CommentAdminRow, error) {
+	db, err := dbOpen()
+	defer db.Close()
+
+	rows, err := db.Query(`
+	Select
+		arts.Title, 
+		Users.screenName,
+		Users.Email,
+		c.Content,
+		c.GUID,
+		c.Status
+	from Articles as arts
+	inner join Comments as c on arts.id = c.ArticleID
+	inner join Users on Users.ID = c.UserID
+	order by c.id desc
+	`)
+	if err != nil {
+		return nil, err
+	}
+	comments := make([]CommentAdminRow, 0)
+
+	for rows.Next() {
+		var c CommentAdminRow
+		err := rows.Scan(&c.ArticleTitle, &c.UserScreenName, &c.UserEmail, &c.Content, &c.GUID, &c.Status)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, c)
+	}
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return comments, nil
+}
+
 func CommentToDB(c akismet.Comment, arName string) error {
-	fmt.Println("Enter CommentToDB")
-	defer fmt.Println("Exit CommentToDB")
 	db, err := dbOpen()
 	defer db.Close()
 	if err != nil {
@@ -60,15 +120,13 @@ func CommentToDB(c akismet.Comment, arName string) error {
 	}{0, 0, c.Content}
 
 	err = tx.QueryRow(`Select id from Users where Email = ?`, c.AuthorEmail).Scan(&in.UserID)
-	switch {
-	case err == sql.ErrNoRows:
+	if err == sql.ErrNoRows {
 		var u_err error
 		in.UserID, u_err = addUser(c, tx)
 		if u_err != nil {
 			return rb(err)
 		}
-		break
-	case err != nil:
+	} else if err != nil {
 		return rb(err)
 	}
 	err = tx.QueryRow(`Select id from Articles where URL = ?`, arName).Scan(&in.ArticleID)
@@ -82,15 +140,14 @@ func CommentToDB(c akismet.Comment, arName string) error {
 	// The results and error(if any)
 	q := `Insert into Comments (UserID, ArticleID, Content, GUID, Status) 
 			values (?, ?, ?, ?, ?)`
-	r, err := tx.Exec(q, in.UserID, in.ArticleID, in.Content, guid, "Shown")
+	r, err := tx.Exec(q, in.UserID, in.ArticleID, in.Content, guid, "Hidden")
 	if err != nil {
 		return rb(err)
 	}
 	numRows, err := r.RowsAffected()
-	switch {
-	case err != nil:
+	if err != nil {
 		return rb(err)
-	case numRows != 1:
+	} else if numRows != 1 {
 		return rb(fmt.Errorf("Error: %d rows were affected instead of 1", numRows))
 	}
 	err = tx.Commit()

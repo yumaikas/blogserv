@@ -89,6 +89,7 @@ func (ars articleList) IsAdmin() bool {
 	}
 	return true
 }
+
 func postComment(w http.ResponseWriter, r *http.Request) {
 	articleName := r.URL.Path[len("/submitComment/"):]
 
@@ -147,11 +148,30 @@ var showComment = adminComment("/admin/showComment/", arts.ShowComment)
 var hideComment = adminComment("/admin/hideComment/", arts.HideComment)
 var deleteComment = adminComment("/admin/deleteComment/", arts.DeleteComment)
 
+func listComments(w http.ResponseWriter, r *http.Request, userID string) {
+	comments, err := arts.ListAllComments()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	err = renderCommentsAdmin(comments, w)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+}
+
 // This is a template for comment administration
 func adminComment(path string, adminAction func(string) error) WebAdmin.AuthedFunc {
 	return func(w http.ResponseWriter, r *http.Request, userID string) {
 		guid := r.URL.Path[len(path):]
-		err := adminAction(guid)
+		articlePath, err := arts.ArticleFromComment(guid)
+		if err != nil {
+			fmt.Println("In path:", path, "Error occured:", err)
+			w.WriteHeader(500)
+			fmt.Fprint(w, Err500.Error())
+			return
+		}
+		err = adminAction(guid)
 		if err != nil {
 			fmt.Println("In path:", path, "Error occured:", err)
 			w.WriteHeader(500)
@@ -168,7 +188,7 @@ func adminComment(path string, adminAction func(string) error) WebAdmin.AuthedFu
 			http.Redirect(w, r, r.Referer(), 303)
 			return
 		}
-		http.Redirect(w, r, "/admin/home", 303)
+		http.Redirect(w, r, "/blog/"+articlePath, 303)
 	}
 }
 

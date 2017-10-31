@@ -5,9 +5,9 @@ import (
 	"bytes"
 	"fmt"
 	"mime"
-	"sync"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/yumaikas/blogserv/WebAdmin"
 	arts "github.com/yumaikas/blogserv/blogArticles"
@@ -74,26 +74,28 @@ func assignPaths() {
 	node("/admin/hideComment/", authed(hideComment))
 	node("/admin/showComment/", authed(showComment))
 	node("/admin/deleteComment/", authed(deleteComment))
+	node("/admin/listcomments/", authed(listComments))
 }
+
 func main() {
 	// Needs to be called inside main() for some reason. I suspect that it has
 	// something to do with initization order, but am not sure.
 	addClickOnceMimeTypes()
 	assignPaths()
 
-        // cert := "/etc/letsencrypt/live/junglecoder.com/fullchain.pem"
+	// cert := "/etc/letsencrypt/live/junglecoder.com/fullchain.pem"
 	// key := "/etc/letsencrypt/live/junglecoder.com/privkey.pem"
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 	/*
-	go func() {
-		err := http.ListenAndServeTLS(":443", cert, key, logMux)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		wg.Done()
-	}()
+		go func() {
+			err := http.ListenAndServeTLS(":443", cert, key, logMux)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			wg.Done()
+		}()
 	*/
 	go func() {
 		err := http.ListenAndServe(":8080", logMux)

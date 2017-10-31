@@ -1,0 +1,45 @@
+{{define "commentList"}}
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="/css/homepage.css" rel="stylesheet" type="text/css">
+		<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+		<script type="text/javascript" src="/js/prettify.js"></script>
+		<title>
+			Jungle Coder
+		</title>
+	</head>
+	<body onload="prettyPrint();">
+		<div class="headingBacker">
+			<div class="headingForeground">
+				<a class="heading" href="/">Jungle Coder</a>
+				<p id="motto"><i>The musings of a third culture coder and missionary kid</i></p>
+			</div>
+		</div>
+		<div id="main">
+			<div class="sidebar"> Comment admin stuffs.... 
+				</div>
+			<div class="content left body">
+                {{/*The Model for this page is a slice of CommentAdminRows*/}} 
+                {{range .}}
+                    {{ if eq .Status "Deleted"}}{{else}}
+                        <h3>
+                           On {{.ArticleTitle}} 
+                            <a href="/admin/deleteComment/{{.GUID}}">Delete</a>
+                            {{ if eq .Status "Shown" }}
+                            <a href="/admin/hideComment/{{.GUID}}">Hide</a>
+                            {{ else }}
+                            <a href="/admin/showComment/{{.GUID}}">Show</a>
+                            {{end}}
+                        </h3>
+                        <div>Username: {{.UserScreenName}}</div>
+                        <div>Email: {{.UserEmail}}</div>
+                        {{ .Content}}
+                        <hr>
+                    {{end}}
+                {{end}}
+			</div>
+		</div>
+	</body>
+</html>
+{{end}}

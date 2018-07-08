@@ -8,7 +8,6 @@ import (
 	"regexp"
 
 	"github.com/yumaikas/blogserv/WebAdmin"
-	"github.com/yumaikas/blogserv/notifications"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tgascoigne/akismet"
@@ -92,11 +91,16 @@ func (ars articleList) IsAdmin() bool {
 
 func postComment(w http.ResponseWriter, r *http.Request) {
 	articleName := r.URL.Path[len("/submitComment/"):]
-
-	redirect := func() {
-		url := "/blog/" + articleName
-		http.Redirect(w, r, url, 303)
+	// This really should have been taken care of at the router
+	// level, but I was a web noob when I first wrote this codebase
+	// and it's not really worth rebuilding the whole thing now
+	// This should help keep down on the amount of completely empty
+	// comments I've been seeing
+	// - Andrew Owen, 7/7/2018
+	if r.Method != "POST" {
+		return
 	}
+
 	r.ParseForm()
 	comment := akismet.Comment{
 		UserIP:      r.RemoteAddr,
@@ -105,36 +109,23 @@ func postComment(w http.ResponseWriter, r *http.Request) {
 		AuthorEmail: r.FormValue("email"),
 		Content:     r.FormValue("Comment"),
 	}
-	err := akismet.CommentCheck(akis, comment)
-	if err != nil {
-		switch err {
-		case akismet.ErrSpam:
-			arts.SpamToDB(comment, articleName)
-			return
-		case akismet.ErrInvalidRequest:
-			log.Printf("Aksimet request invalid: %s\n", err.Error())
-		case akismet.ErrUnknown:
-			log.Printf("An abnormal error happened when querying akismet: %s", err.Error())
-		case akismet.ErrInvalidKey:
-			log.Printf("Aksimet key invalid, no spam checking available.")
-		}
-		return // Nothing more we can do here for now
+
+	// Validate that the comment actually has content
+	if len(comment.Content) <= 0 ||
+		len(comment.Author) <= 0 {
+		http.Error(w, "Please fill out your name and a valid comment", 400)
+		return
 	}
 
 	// Notify here. send the request in.
-	err = arts.CommentToDB(comment, articleName)
+	err := arts.CommentToDB(comment, articleName)
 	if err != nil {
 		fmt.Println("Error when submitting comment: ", err)
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	// Add a successful comment to the notification
-	notifications.NotifyComment(arts.Comment{UserName: comment.Author, Content: comment.Content},
-		comment.AuthorEmail,
-		articleName,
-		articleName,
-		r)
-	redirect()
+	url := "/blog/" + articleName
+	http.Redirect(w, r, url, 303)
 }
 
 // Made to only redirect when the referer is from the website. I don't want a open redirect relay

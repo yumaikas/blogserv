@@ -41,6 +41,6 @@ func renderFeed(w io.Writer) error {
 
 func (ar Article) RSSLink() *feeds.Link {
 	// The website name is currently hardcoded. This will need to change in the future
-	url := "http:// www.junglecoder.com/blog/" + ar.URL
+	url := "http://www.junglecoder.com/blog/" + ar.URL
 	return &feeds.Link{Href: url}
 }

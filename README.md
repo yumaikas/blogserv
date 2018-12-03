@@ -1,4 +1,4 @@
-#Blogserv - Work In Progress blog engine in golang.
+# Blogserv - Work In Progress blog engine in golang.
 
 This is the software that powers https://junglecoder.com. It is currently only intended for personal use by those who are interested in go. It runs on both windows and linux with only changing an environment variable for configurations. 
 

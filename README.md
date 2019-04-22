@@ -21,7 +21,7 @@ Choices currently made for this engine:
 * Powered by a Sqlite file 
 * Log to stderr, redirect when launching from cmd line
 
-##Current state of deployment (to be made easier)
+## Current state of deployment (to be made easier)
 To set it up on your VPS/server you will need to at least do the following:
 
 1- Make sure that you have Sqlite3 (the `libsqlite3-dev` package on apt) and [golang](http://golang.org/doc/install) installed. 
